@@ -80,11 +80,21 @@ static int pcf_addrs[] = {
   PCF8574_ADDR_1, PCF8574_ADDR_2, PCF8574_ADDR_3, PCF8574_ADDR_4, PCF8574_ADDR_5, PCF8574_ADDR_6
 };
 
+int getPCF8574at(int addr) {
+  if(addr < 0) {
+    addr = 0;
+  }
+  if(addr > PCF8574_AMOUNT - 1) {
+    addr = PCF8574_AMOUNT -1;
+  }
+  return pcf_addrs[addr];
+}
+
 void pcf8574_init(void) {
   pcf8574State = 0xff;
 
   for(int a = 0; a < PCF8574_AMOUNT; a++) {
-    Wire.beginTransmission(pcf_addrs[a]);
+    Wire.beginTransmission(getPCF8574at(a));
     Wire.write(pcf8574State);
     Wire.endTransmission();
   }

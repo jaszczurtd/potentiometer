@@ -24,6 +24,7 @@ void timerTick(void);
 void setupTimerWith(unsigned long ut, unsigned long time, bool(*function)(void *argument));
 bool isWireBusy(unsigned int dataAddress);
 void pcf8574_init(void);
+int getPCF8574at(int addr);
 void pcf8574_write(int pcf_addr, unsigned char pin, bool value);
 bool pcf8574_read(int pcf_addr, unsigned char pin);
 void writeAT24(unsigned int dataAddress, byte dataVal);
