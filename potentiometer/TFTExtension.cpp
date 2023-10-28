@@ -16,12 +16,10 @@ TFT *returnTFTReference(void) {
   return tft;
 }
 
-bool softInitDisplay(void *arg) {
+void softInitDisplay(void) {
   TFT *tft = returnTFTReference();
-  tft->softInit(75);
+  tft->softInit(100);
   tft->setRotation(1);
-
-  return true;
 }
 
 void redrawAllGauges(void) {
@@ -30,7 +28,6 @@ void redrawAllGauges(void) {
 
 TFTExtension::TFTExtension(uint8_t cs, uint8_t dc, uint8_t rst) : Adafruit_ILI9341(cs, dc, rst) { }
 
-//unfortunately cannot reuse initcmd from Adafruit_ILI9341 directly
 static const uint8_t PROGMEM initcmd[] = {
   0xEF, 3, 0x03, 0x80, 0x02,
   0xCF, 3, 0x00, 0xC1, 0x30,
@@ -62,6 +59,7 @@ static const uint8_t PROGMEM initcmd[] = {
 void TFTExtension::softInit(int d) {
   uint8_t cmd, x, numArgs;
   const uint8_t *addr = initcmd;
+
   while ((cmd = pgm_read_byte(addr++)) > 0) {
     x = pgm_read_byte(addr++);
     numArgs = x & 0x7F;

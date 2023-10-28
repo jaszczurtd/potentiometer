@@ -12,6 +12,7 @@
 #include "tools.h"
 #include "TFTExtension.h"
 #include "hardwareConfig.h"
+#include "peripherials.h"
 
 #define MEDIUM_TIME_ONE_SECOND_DIVIDER 12
 #define FREQUENT_TIME_ONE_SECOND_DIVIDER 16

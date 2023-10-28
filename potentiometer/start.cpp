@@ -1,6 +1,8 @@
 
 #include "start.h"
 
+void powerSequence(bool state);
+
 void setupTimers(void) {
   int time = SECOND;
   createTimerObject();
@@ -13,14 +15,11 @@ void initialization(void) {
  
   TFT *tft = initTFT();
 
-  //adafruit LCD driver is messing up something with i2c on rpi pin 0 & 1
-  //this has to be invoked as soon as possible, and twice
   initI2C();
   pcf8574_init();
   Wire.end();
 
   initSPI();
-
   initI2C();
 
   #ifdef RESET_EEPROM
@@ -28,12 +27,15 @@ void initialization(void) {
   #endif
 
   initBasicPIO();
+  initPeripherials();
+
+  //powerSequence(LOW);
 
   #ifdef I2C_SCANNER
   i2cScanner();
   #endif
 
-  tft->fillScreen(ICONS_BG_COLOR);
+  tft->fillScreen(COLOR(ORANGE));//ICONS_BG_COLOR);
 
   setupTimers();
 
@@ -51,13 +53,20 @@ bool callAtEverySecond(void *argument) {
 
   //regular draw - low importance values
 //  drawLowImportanceValues();
-  
+  softInitDisplay();
   return true; 
 }
 
 void looper(void) {
   timerTick();
 
+  if(isPowerPressed()) {
+    while(isPowerPressed()) {
+      timerTick();
+      delay(CORE_OPERATION_DELAY);  
+    }
+    powerSequence(!isPowerON());
+  }
   delay(CORE_OPERATION_DELAY);  
 }
 
@@ -70,3 +79,9 @@ void looper1(void) {
   delay(CORE_OPERATION_DELAY);  
 }
 
+void powerSequence(bool state) {
+
+  power(state);
+
+
+}

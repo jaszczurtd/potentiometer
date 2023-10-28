@@ -49,7 +49,7 @@ private:
 
 TFT *initTFT(void);
 TFT *returnTFTReference(void);
-bool softInitDisplay(void *arg);
+void softInitDisplay(void);
 void redrawAllGauges(void);
 
 #endif

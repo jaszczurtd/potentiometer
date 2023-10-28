@@ -30,4 +30,10 @@
 #define TFT_RST    -1 //reset
 #define TFT_DC     15 //A0
 
+//peripherials
+
+#define PIN_POWER_IN 21
+#define PIN_POWER_OUT 2
+
+
 #endif
