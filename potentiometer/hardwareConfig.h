@@ -28,12 +28,17 @@
 //LCD / display
 #define TFT_CS     17 //CS
 #define TFT_RST    -1 //reset
-#define TFT_DC     15 //A0
+#define TFT_DC     15 //A0 (DC)
 
 //peripherials
 
 #define PIN_POWER_IN 21
 #define PIN_POWER_OUT 2
+#define PIN_MUTE_IN 6
+#define PIN_MUTE_OUT 14
+
+#define PIN_ENC_L 4
+#define PIN_ENC_R 5
 
 
 #endif

@@ -2,11 +2,15 @@
 #include "start.h"
 
 void powerSequence(bool state);
+bool displayValues(void *v);
+
+unsigned char values[MAX_VALUES];
 
 void setupTimers(void) {
   int time = SECOND;
   createTimerObject();
   setupTimerWith(UNSYNCHRONIZE_TIME, time, callAtEverySecond);
+  setupTimerWith(UNSYNCHRONIZE_TIME, time / 8, displayValues);
 }
 
 void initialization(void) {
@@ -35,7 +39,7 @@ void initialization(void) {
   i2cScanner();
   #endif
 
-  tft->fillScreen(COLOR(ORANGE));//ICONS_BG_COLOR);
+  tft->fillScreen(ICONS_BG_COLOR);
 
   setupTimers();
 
@@ -53,7 +57,6 @@ bool callAtEverySecond(void *argument) {
 
   //regular draw - low importance values
 //  drawLowImportanceValues();
-  softInitDisplay();
   return true; 
 }
 
@@ -63,10 +66,20 @@ void looper(void) {
   if(isPowerPressed()) {
     while(isPowerPressed()) {
       timerTick();
-      delay(CORE_OPERATION_DELAY);  
     }
     powerSequence(!isPowerON());
   }
+
+  if(isPowerON()) {
+    if(isMutePressed()) {
+      while(isMutePressed()) {
+        timerTick();
+      }
+      mute(!isMuteON());
+    }
+
+  }
+
   delay(CORE_OPERATION_DELAY);  
 }
 
@@ -80,8 +93,31 @@ void looper1(void) {
 }
 
 void powerSequence(bool state) {
-
   power(state);
+  softInitDisplay();
+  redraw();
+}
 
+static bool redrawScreen = false;
+void redraw(void) {
+  redrawScreen = true;
+}
 
+bool displayValues(void *v) {
+
+  if(!isPowerON()){
+    return true;
+  }
+
+  if(redrawScreen) {
+    TFT *tft = returnTFTReference();
+
+    tft->prepareText("volume: %d", values[V_VOLUME]);
+    tft->fillRect(0, 0, 160, 100, ICONS_BG_COLOR);
+    tft->sansBoldWithPosAndColor(10, 30, 0xffffff);
+    tft->printlnFromPreparedText();
+    redrawScreen = false;
+  }
+
+  return true;
 }

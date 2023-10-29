@@ -14,8 +14,9 @@
 #include "hardwareConfig.h"
 #include "peripherials.h"
 
-#define MEDIUM_TIME_ONE_SECOND_DIVIDER 12
-#define FREQUENT_TIME_ONE_SECOND_DIVIDER 16
+#define MAX_VALUES 16
+
+extern unsigned char values[];
 
 void drawMediumImportanceValues(void);
 void drawHighImportanceValues(void);
@@ -32,5 +33,6 @@ void looper(void);
 void looper1(void);
 bool seriousAlertSwitch(void);
 bool alertSwitch(void);
+void redraw(void);
 
 #endif

@@ -3,7 +3,7 @@
 
 static Timer generalTimer;
 
-NOINIT static char deb_buffer[128];
+NOINIT static char deb_buffer[MAX_DEB_BUFFER];
 void deb(const char *format, ...) {
 
   rp2040.idleOtherCore();
@@ -20,7 +20,7 @@ void deb(const char *format, ...) {
   rp2040.resumeOtherCore();
 }
 
-NOINIT static char derr_buffer[128];
+NOINIT static char derr_buffer[MAX_DEB_BUFFER];
 void derr(const char *format, ...) {
 
   rp2040.idleOtherCore();

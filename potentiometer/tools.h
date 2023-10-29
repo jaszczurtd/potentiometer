@@ -10,9 +10,13 @@
 #include "config.h"
 #include "start.h"
 
+#define MAX_DEB_BUFFER 128
+
 #ifndef NOINIT
 #define NOINIT __attribute__((section(".noinit"))) 
 #endif
+
+extern unsigned char values[];
 
 void deb(const char *format, ...);
 void derr(const char *format, ...);
