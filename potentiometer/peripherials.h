@@ -9,6 +9,8 @@
 
 extern unsigned char values[];
 
+#define MAX_VOLUME 64
+
 #define V_VOLUME 0
 #define V_MUTE 1
 
