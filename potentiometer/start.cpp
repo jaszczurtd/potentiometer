@@ -6,6 +6,7 @@ bool displayValues(void *v);
 bool volumeSave(void *v);
 
 unsigned char values[MAX_VALUES];
+static int lastStoredVolume = P_UNDETERMINED;
 
 void setupTimers(void) {
   int time = SECOND;
@@ -92,6 +93,11 @@ void looper(void) {
       values[V_SELECTED_INPUT] = input;
       storeValuesToEEPROM();
     }
+
+    if(lastStoredVolume != values[V_VOLUME]) {
+      lastStoredVolume = values[V_VOLUME];
+      setVol(lastStoredVolume);
+    }
   }
 
   delay(CORE_OPERATION_DELAY);  
@@ -115,6 +121,8 @@ void powerSequence(bool state) {
     mute(false);
   } else {
     restoreValuesFromEEPROM();
+    lastStoredVolume = values[V_VOLUME];
+    setVol(values[V_VOLUME]);    
   }
 }
 

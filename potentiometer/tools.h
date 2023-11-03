@@ -12,6 +12,8 @@
 
 #define MAX_DEB_BUFFER 128
 
+#define INIT_PCF_STATE 0xff
+
 #ifndef NOINIT
 #define NOINIT __attribute__((section(".noinit"))) 
 #endif
@@ -30,7 +32,7 @@ bool isWireBusy(unsigned int dataAddress);
 void pcf8574_init(void);
 int getPCF8574at(int addr);
 void pcf8574_write(int pcf_addr, unsigned char pin, bool value);
-bool pcf8574_read(int pcf_addr, unsigned char pin);
+unsigned char pcf8574_read(int pcf_addr);
 void writeAT24(unsigned int dataAddress, byte dataVal);
 byte readAT24(unsigned int dataAddress);
 void writeAT24Int(unsigned int dataAddress, int dataVal);

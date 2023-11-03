@@ -62,12 +62,14 @@ void encInit(void) {
 
 void encoderSupport(void) {
   if(isPowerON()) {
+    delayMicroseconds(ENC_DEBOUNCE);
     support = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
   }
 }
 
 void encoder(void) {
   if(isPowerON()) {
+    delayMicroseconds(ENC_DEBOUNCE);
     int val = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
     if(val != lastVal) {
       int volume = values[V_VOLUME];
@@ -80,7 +82,6 @@ void encoder(void) {
         (lastVal == P_UNDETERMINED && val == 0 && support == 0) ||
         (lastVal == 2 && val == 0 && support == 0) || 
         (lastVal == 0 && val == 2 && support == 0) ||
-        (lastVal == 3 && val == 0 && support == 0) ||
         (lastVal == 2 && val == 0 && support == 3) ||
         (lastVal == 0 && val == 2 && support == 2)) {
 
@@ -95,6 +96,7 @@ void encoder(void) {
       if((lastVal == P_UNDETERMINED && val == 3 && support == P_UNDETERMINED) ||
         (lastVal == P_UNDETERMINED && val == 3 && support == 3) ||
         (lastVal == P_UNDETERMINED && val == 0 && support == 2) ||
+        (lastVal == 3 && val == 0 && support == 0) ||
         (lastVal == 2 && val == 0 && support == 2) ||
         (lastVal == 0 && val == 3 && support == 3) || 
         (lastVal == 0 && val == 3 && support == 1) || 
@@ -111,8 +113,6 @@ void encoder(void) {
       deb("%d %d %d", lastVal, val, support);
 
       values[V_VOLUME] = volume;
-      setVol(volume);
-
       redraw();
 
       lastVal = val;
@@ -136,11 +136,14 @@ void setVol(int value) {
 
     for (int i = 0; i < PCF8574_AMOUNT; i++) {
       for (int j = 0; j < 8; j++) {
-        pcf8574_write(getPCF8574at(i), j, false);
+        if(i == PCF_INPUTS && j > INPUT_SELECTOR_START_BIT - 1) {
+          break;
+        }
+        pcf8574_write(i, j, true);
       }
     }
 
-    pcf8574_write(getPCF8574at(expanderIndex), bit, true);
+    pcf8574_write(expanderIndex, bit, false);
   }
 }
 
@@ -164,7 +167,7 @@ void selectInput(int input) {
     if(input == a) {
       val = false;
     }
-    pcf8574_write(getPCF8574at(PCF_INPUTS), a + 2, val);
+    pcf8574_write(PCF_INPUTS, a + INPUT_SELECTOR_START_BIT, val);
   }
 }
 

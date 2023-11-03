@@ -79,6 +79,9 @@ static unsigned char pcf8574State = 0;
 static int pcf_addrs[] = {
   PCF8574_ADDR_1, PCF8574_ADDR_2, PCF8574_ADDR_3, PCF8574_ADDR_4, PCF8574_ADDR_5, PCF8574_ADDR_6
 };
+static unsigned char pcf_states[] = {
+  INIT_PCF_STATE, INIT_PCF_STATE, INIT_PCF_STATE, INIT_PCF_STATE, INIT_PCF_STATE, INIT_PCF_STATE
+};
 
 int getPCF8574at(int addr) {
   if(addr < 0) {
@@ -91,24 +94,24 @@ int getPCF8574at(int addr) {
 }
 
 void pcf8574_init(void) {
-  pcf8574State = 0xff;
-
   for(int a = 0; a < PCF8574_AMOUNT; a++) {
+    pcf_states[a] = INIT_PCF_STATE;
     Wire.beginTransmission(getPCF8574at(a));
-    Wire.write(pcf8574State);
+    Wire.write(pcf_states[a]);
     Wire.endTransmission();
   }
 }
 
 void pcf8574_write(int pcf_addr, unsigned char pin, bool value) {
+
   if(value) {
-    bitSet(pcf8574State, pin);
+    bitSet(pcf_states[pcf_addr], pin);
   }  else {
-    bitClear(pcf8574State, pin);
+    bitClear(pcf_states[pcf_addr], pin);
   }
 
-  Wire.beginTransmission(pcf_addr);
-  bool success = Wire.write(pcf8574State);
+  Wire.beginTransmission(getPCF8574at(pcf_addr));
+  bool success = Wire.write(pcf_states[pcf_addr]);
   bool notFound = Wire.endTransmission();
 
   if(!success) {
@@ -125,9 +128,9 @@ bool isWireBusy(unsigned int dataAddress) {
   return Wire.endTransmission();
 }
 
-bool pcf8574_read(int pcf_addr, unsigned char pin) {
+unsigned char pcf8574_read(int pcf_addr) {
   Wire.beginTransmission(pcf_addr);
-  bool retVal = Wire.read();
+  unsigned char retVal = Wire.read();
   bool notFound = Wire.endTransmission();
 
   if(notFound) {

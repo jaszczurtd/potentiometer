@@ -10,9 +10,11 @@
 extern unsigned char values[];
 
 #define MAX_VOLUME 42
+#define INPUT_SELECTOR_START_BIT 2 
 
 #define P_UNDETERMINED -1
-#define MUTE_FOR_CHANGE_VOLUME 200
+#define MUTE_FOR_CHANGE_VOLUME 200 //ms
+#define ENC_DEBOUNCE 5 //us
 
 #define V_VOLUME 0
 #define V_MUTE 1
