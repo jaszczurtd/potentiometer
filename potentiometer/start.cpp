@@ -6,6 +6,7 @@ bool displayValues(void *v);
 bool volumeSave(void *v);
 bool enableSpeakers(void *v);
 bool enableSoftPower(void *v);
+void rc5Result(unsigned char toggle, unsigned char address, unsigned char command);
 
 unsigned char values[MAX_VALUES];
 static int lastStoredVolume = P_UNDETERMINED;
@@ -37,6 +38,8 @@ void initialization(void) {
 
   initBasicPIO();
   initPeripherials();
+  RC5 *rc5 = initRC5(RC5PIN);
+  rc5->setCallback(rc5Result);
 
   //powerSequence(LOW);
 
@@ -100,7 +103,7 @@ void looper(void) {
       lastStoredVolume = values[V_VOLUME];
       setVol(lastStoredVolume);
     }
-    rc5Loop();
+
   }
 
   delay(CORE_OPERATION_DELAY);  
@@ -117,21 +120,21 @@ void looper1(void) {
 
 void powerSequence(bool state) {
   power(state);
-  softInitDisplay();
-  redraw();
-  if(!state) {
+  if(state) {
+    softInitDisplay();
+    redraw();
+    restoreValuesFromEEPROM();
+    lastStoredVolume = values[V_VOLUME];
+    setVol(values[V_VOLUME]); 
+    launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
+    launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
+  } else {
     cancelTimerTasks();
     speakers(false);
     softPower(false);
     pcf8574_init();
     mute(false);
     setupTimers();
-  } else {
-    restoreValuesFromEEPROM();
-    lastStoredVolume = values[V_VOLUME];
-    setVol(values[V_VOLUME]); 
-    launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
-    launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
   }
 }
 
@@ -179,4 +182,14 @@ bool enableSpeakers(void *v) {
 bool enableSoftPower(void *v) {
   softPower(true);
   return false;
+}
+
+void rc5Result(unsigned char toggle, unsigned char address, unsigned char command) {
+
+
+  if(!toggle) {
+    deb("%d %d %d", toggle, address, command);
+
+  }
+
 }

@@ -4,7 +4,6 @@
 void encoder(void);
 void encoderSupport(void);
 void encInit(void);
-void rc5Init(void);
 
 static unsigned char inputsTab[] = {
   PIN_INPUT_6, PIN_INPUT_5, PIN_INPUT_4, PIN_INPUT_3, PIN_INPUT_1, PIN_INPUT_2
@@ -209,17 +208,4 @@ void restoreValuesFromEEPROM(void) {
     input = 0;
   }
   selectInput(input);
-}
-
-RC5 rc5(RC5PIN);
-unsigned char toggle = 0;
-unsigned char address = 0; 
-unsigned char command = 0;
-
-void rc5Loop(void) {
-
-  if (rc5.read(&toggle, &address, &command)) {
-    deb("%d %d %d", toggle, address, command);
-  }
-
 }
