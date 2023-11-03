@@ -14,14 +14,13 @@
 #include "hardwareConfig.h"
 #include "peripherials.h"
 
-#define MAX_VALUES 16
-
 extern unsigned char values[];
 
 void drawMediumImportanceValues(void);
 void drawHighImportanceValues(void);
 void drawLowImportanceValues(void);
 void triggerDrawHighImportanceValue(bool state);
+void storeControlLocalVolume(void);
 
 bool callAtEverySecond(void *argument);
 bool callAtEveryHalfSecond(void *argument);

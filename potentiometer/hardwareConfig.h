@@ -16,12 +16,16 @@
 
 //PCF8574 i2c addr
 #define PCF8574_AMOUNT 6
+
 #define PCF8574_ADDR_1 0x38
-#define PCF8574_ADDR_2 0x39
-#define PCF8574_ADDR_3 0x3b
-#define PCF8574_ADDR_4 0x3c
-#define PCF8574_ADDR_5 0x3e
-#define PCF8574_ADDR_6 0x3f
+#define PCF8574_ADDR_2 0x3c
+#define PCF8574_ADDR_3 0x3e
+#define PCF8574_ADDR_4 0x3f
+#define PCF8574_ADDR_5 0x39
+#define PCF8574_ADDR_6 0x3b
+
+//whichone PCF8574 chip (index) is used as input selector?
+#define PCF_INPUTS 5
 
 #define EEPROM_I2C_ADDRESS 0x50
 
@@ -40,5 +44,11 @@
 #define PIN_ENC_L 4
 #define PIN_ENC_R 5
 
+#define PIN_IMPUT_1 7
+#define PIN_IMPUT_2 9
+#define PIN_IMPUT_3 10
+#define PIN_IMPUT_4 11
+#define PIN_IMPUT_5 12
+#define PIN_IMPUT_6 13
 
 #endif

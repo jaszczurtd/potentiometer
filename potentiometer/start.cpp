@@ -3,6 +3,7 @@
 
 void powerSequence(bool state);
 bool displayValues(void *v);
+bool volumeSave(void *v);
 
 unsigned char values[MAX_VALUES];
 
@@ -11,6 +12,7 @@ void setupTimers(void) {
   createTimerObject();
   setupTimerWith(UNSYNCHRONIZE_TIME, time, callAtEverySecond);
   setupTimerWith(UNSYNCHRONIZE_TIME, time / 8, displayValues);
+  setupTimerWith(UNSYNCHRONIZE_TIME, time / 4, volumeSave);
 }
 
 void initialization(void) {
@@ -75,9 +77,21 @@ void looper(void) {
       while(isMutePressed()) {
         timerTick();
       }
-      mute(!isMuteON());
+      values[V_MUTE] = !isMuteON();
+      mute(values[V_MUTE]);
+      storeValuesToEEPROM();
     }
 
+    if(!values[V_MUTE]) {
+      muteWithEncoderSupport();
+    }
+
+    int input = checkAndApplyInputs();
+    if(input != -1) {
+      selectInput(input);
+      values[V_SELECTED_INPUT] = input;
+      storeValuesToEEPROM();
+    }
   }
 
   delay(CORE_OPERATION_DELAY);  
@@ -96,6 +110,12 @@ void powerSequence(bool state) {
   power(state);
   softInitDisplay();
   redraw();
+  if(!state) {
+    pcf8574_init();
+    mute(false);
+  } else {
+    restoreValuesFromEEPROM();
+  }
 }
 
 static bool redrawScreen = false;
@@ -119,5 +139,17 @@ bool displayValues(void *v) {
     redrawScreen = false;
   }
 
+  return true;
+}
+
+static int lastVolume = 0;
+void storeControlLocalVolume(void) {
+  lastVolume = values[V_VOLUME];
+}
+bool volumeSave(void *v) {
+  if(lastVolume != values[V_VOLUME]) {
+    storeControlLocalVolume();
+    storeValuesToEEPROM();
+  }
   return true;
 }
