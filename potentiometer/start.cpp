@@ -92,6 +92,8 @@ void looper(void) {
       values[V_SELECTED_INPUT] = input;
       storeValuesToEEPROM();
     }
+
+    rc5Loop();
   }
 
   delay(CORE_OPERATION_DELAY);  

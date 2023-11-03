@@ -4,6 +4,8 @@
 void encoder(void);
 void encoderSupport(void);
 void encInit(void);
+void rc5Init(void);
+void onIrInterrupt(void);
 
 static unsigned char inputsTab[] = {
   PIN_INPUT_6, PIN_INPUT_5, PIN_INPUT_4, PIN_INPUT_3, PIN_INPUT_1, PIN_INPUT_2
@@ -21,6 +23,7 @@ void initPeripherials(void) {
   }
 
   encInit();
+  rc5Init();
 }
 
 void power(bool state) {
@@ -194,4 +197,40 @@ void restoreValuesFromEEPROM(void) {
     input = 0;
   }
   selectInput(input);
+}
+
+volatile uint16_t rc5Data = 0;
+
+void onIrInterrupt(void) {
+  static uint32_t lastTime = 0;
+  uint32_t currentTime = micros();
+  uint32_t elapsedTime = currentTime - lastTime;
+
+  if (elapsedTime > 2000) {
+    rc5Data = 0;
+  }
+
+  if (elapsedTime > 800 && elapsedTime < 1200) {
+    //"0"
+    rc5Data = (rc5Data << 1) | 0;
+  } else if (elapsedTime > 1500 && elapsedTime < 2000) {
+    //"1"
+    rc5Data = (rc5Data << 1) | 1;
+  }
+
+  lastTime = currentTime;
+}
+
+void rc5Init(void) {
+  pinMode(RC5PIN, INPUT);
+  attachInterrupt(RC5PIN, onIrInterrupt, RISING);
+}
+
+void rc5Loop(void) {
+
+  if (rc5Data != 0) {
+    deb("Received RC5 data: 0x%h", rc5Data);
+    rc5Data = 0;
+  }
+
 }
