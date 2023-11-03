@@ -49,8 +49,8 @@ bool isMutePressed(void) {
 
 static volatile int lastVal = P_UNDETERMINED;
 static volatile int support = P_UNDETERMINED;
-static unsigned long previousMillis = 0; 
-static unsigned long currentMillis;
+static volatile unsigned long previousMillis = 0; 
+static volatile unsigned long currentMillis;
 
 void encInit(void) {
   pinMode(PIN_ENC_L, INPUT_PULLUP);
