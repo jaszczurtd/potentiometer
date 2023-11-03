@@ -5,7 +5,6 @@ void encoder(void);
 void encoderSupport(void);
 void encInit(void);
 void rc5Init(void);
-void onIrInterrupt(void);
 
 static unsigned char inputsTab[] = {
   PIN_INPUT_6, PIN_INPUT_5, PIN_INPUT_4, PIN_INPUT_3, PIN_INPUT_1, PIN_INPUT_2
@@ -23,7 +22,9 @@ void initPeripherials(void) {
   }
 
   encInit();
-  rc5Init();
+
+  pinMode(PIN_SPEAKERS, OUTPUT);
+  pinMode(PIN_SOFTPOWER, OUTPUT);
 }
 
 void power(bool state) {
@@ -48,6 +49,14 @@ bool isMuteON(void) {
 
 bool isMutePressed(void) {
   return !digitalRead(PIN_MUTE_IN);
+}
+
+void speakers(bool state) {
+  digitalWrite(PIN_SPEAKERS, state);
+}
+
+void softPower(bool state) {
+  digitalWrite(PIN_SOFTPOWER, state);
 }
 
 static volatile int lastVal = P_UNDETERMINED;
@@ -202,38 +211,15 @@ void restoreValuesFromEEPROM(void) {
   selectInput(input);
 }
 
-volatile uint16_t rc5Data = 0;
-
-void onIrInterrupt(void) {
-  static uint32_t lastTime = 0;
-  uint32_t currentTime = micros();
-  uint32_t elapsedTime = currentTime - lastTime;
-
-  if (elapsedTime > 2000) {
-    rc5Data = 0;
-  }
-
-  if (elapsedTime > 800 && elapsedTime < 1200) {
-    //"0"
-    rc5Data = (rc5Data << 1) | 0;
-  } else if (elapsedTime > 1500 && elapsedTime < 2000) {
-    //"1"
-    rc5Data = (rc5Data << 1) | 1;
-  }
-
-  lastTime = currentTime;
-}
-
-void rc5Init(void) {
-  pinMode(RC5PIN, INPUT);
-  attachInterrupt(RC5PIN, onIrInterrupt, RISING);
-}
+RC5 rc5(RC5PIN);
+unsigned char toggle = 0;
+unsigned char address = 0; 
+unsigned char command = 0;
 
 void rc5Loop(void) {
 
-  if (rc5Data != 0) {
-    deb("Received RC5 data: 0x%h", rc5Data);
-    rc5Data = 0;
+  if (rc5.read(&toggle, &address, &command)) {
+    deb("%d %d %d", toggle, address, command);
   }
 
 }

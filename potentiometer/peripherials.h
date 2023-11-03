@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include "hardwareConfig.h"
 #include "start.h"
+#include "RC5.h"
 
 extern unsigned char values[];
 
@@ -26,6 +27,8 @@ void power(bool state);
 bool isPowerON(void);
 bool isPowerPressed(void);
 void mute(bool state);
+void speakers(bool state);
+void softPower(bool state);
 bool isMuteON(void);
 bool isMutePressed(void);
 void muteWithEncoderSupport(void);

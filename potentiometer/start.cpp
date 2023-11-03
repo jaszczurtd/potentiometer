@@ -4,6 +4,8 @@
 void powerSequence(bool state);
 bool displayValues(void *v);
 bool volumeSave(void *v);
+bool enableSpeakers(void *v);
+bool enableSoftPower(void *v);
 
 unsigned char values[MAX_VALUES];
 static int lastStoredVolume = P_UNDETERMINED;
@@ -118,12 +120,18 @@ void powerSequence(bool state) {
   softInitDisplay();
   redraw();
   if(!state) {
+    cancelTimerTasks();
+    speakers(false);
+    softPower(false);
     pcf8574_init();
     mute(false);
+    setupTimers();
   } else {
     restoreValuesFromEEPROM();
     lastStoredVolume = values[V_VOLUME];
-    setVol(values[V_VOLUME]);    
+    setVol(values[V_VOLUME]); 
+    launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
+    launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
   }
 }
 
@@ -161,4 +169,14 @@ bool volumeSave(void *v) {
     storeValuesToEEPROM();
   }
   return true;
+}
+
+bool enableSpeakers(void *v) {
+  speakers(true);
+  return false;
+}
+
+bool enableSoftPower(void *v) {
+  softPower(true);
+  return false;
 }

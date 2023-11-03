@@ -69,10 +69,15 @@ void timerTick(void) {
 }
 
 void setupTimerWith(unsigned long ut, unsigned long time, bool(*function)(void *argument)) {
-  watchdog_update();
   generalTimer.every(time, function);
-  delay(ut);
-  watchdog_update();
+}
+
+void launchTaskAt(unsigned long time, bool(*function)(void *argument)) {
+  generalTimer.in(time, function);  
+}
+
+void cancelTimerTasks(void) {
+  generalTimer.cancel();
 }
 
 static unsigned char pcf8574State = 0;

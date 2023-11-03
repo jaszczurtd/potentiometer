@@ -41,6 +41,9 @@
 #define PIN_MUTE_IN 6
 #define PIN_MUTE_OUT 14
 
+#define PIN_SPEAKERS 3
+#define PIN_SOFTPOWER 28
+
 #define PIN_ENC_L 4
 #define PIN_ENC_R 5
 

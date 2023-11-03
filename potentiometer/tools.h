@@ -28,6 +28,8 @@ void initSPI(void);
 void createTimerObject(void);
 void timerTick(void);
 void setupTimerWith(unsigned long ut, unsigned long time, bool(*function)(void *argument));
+void launchTaskAt(unsigned long time, bool(*function)(void *argument));
+void cancelTimerTasks(void);
 bool isWireBusy(unsigned int dataAddress);
 void pcf8574_init(void);
 int getPCF8574at(int addr);
