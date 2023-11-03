@@ -98,6 +98,7 @@ void looper(void) {
       lastStoredVolume = values[V_VOLUME];
       setVol(lastStoredVolume);
     }
+    rc5Loop();
   }
 
   delay(CORE_OPERATION_DELAY);  

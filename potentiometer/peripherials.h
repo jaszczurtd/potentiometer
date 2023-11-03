@@ -34,6 +34,7 @@ int checkAndApplyInputs(void);
 void selectInput(int input);
 void storeValuesToEEPROM(void);
 void restoreValuesFromEEPROM(void);
+void rc5Loop(void);
 
 #endif
 
