@@ -27,6 +27,7 @@ void mute(bool state);
 bool isMuteON(void);
 bool isMutePressed(void);
 void muteWithEncoderSupport(void);
+void setVol(int value);
 int checkAndApplyInputs(void);
 void selectInput(int input);
 void storeValuesToEEPROM(void);

@@ -44,11 +44,11 @@
 #define PIN_ENC_L 4
 #define PIN_ENC_R 5
 
-#define PIN_IMPUT_1 7
-#define PIN_IMPUT_2 9
-#define PIN_IMPUT_3 10
-#define PIN_IMPUT_4 11
-#define PIN_IMPUT_5 12
-#define PIN_IMPUT_6 13
+#define PIN_INPUT_1 7
+#define PIN_INPUT_2 9
+#define PIN_INPUT_3 10
+#define PIN_INPUT_4 11
+#define PIN_INPUT_5 12
+#define PIN_INPUT_6 13
 
 #endif

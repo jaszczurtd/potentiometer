@@ -5,8 +5,8 @@ void encoder(void);
 void encoderSupport(void);
 void encInit(void);
 
-unsigned char inputsTab[] = {
-  PIN_IMPUT_6, PIN_IMPUT_5, PIN_IMPUT_4, PIN_IMPUT_3, PIN_IMPUT_1, PIN_IMPUT_2
+static unsigned char inputsTab[] = {
+  PIN_INPUT_6, PIN_INPUT_5, PIN_INPUT_4, PIN_INPUT_3, PIN_INPUT_1, PIN_INPUT_2
 };
 
 void initPeripherials(void) {
@@ -16,7 +16,7 @@ void initPeripherials(void) {
   pinMode(PIN_MUTE_IN, INPUT_PULLUP);
   pinMode(PIN_MUTE_OUT, OUTPUT);
 
-  for(int a = 0; a < sizeof(inputsTab); a++) {
+  for(int a = 0; a < (int)sizeof(inputsTab); a++) {
     pinMode(inputsTab[a], INPUT_PULLUP);
   }
 
@@ -71,7 +71,6 @@ void encoder(void) {
     int val = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
     if(val != lastVal) {
       int volume = values[V_VOLUME];
-      int movement = P_UNDETERMINED;
 
       if(!values[V_MUTE]) {
         currentMillis = millis();
@@ -112,6 +111,8 @@ void encoder(void) {
       deb("%d %d %d", lastVal, val, support);
 
       values[V_VOLUME] = volume;
+      setVol(volume);
+
       redraw();
 
       lastVal = val;
@@ -127,9 +128,25 @@ void muteWithEncoderSupport(void) {
   }
 }
 
+void setVol(int value) {
+
+  if (value >= 0 && value < MAX_VOLUME) {
+    int bit = value % 8;
+    int expanderIndex = value / 8;
+
+    for (int i = 0; i < PCF8574_AMOUNT; i++) {
+      for (int j = 0; j < 8; j++) {
+        pcf8574_write(getPCF8574at(i), j, false);
+      }
+    }
+
+    pcf8574_write(getPCF8574at(expanderIndex), bit, true);
+  }
+}
+
 int checkAndApplyInputs(void) {
   if(isPowerON()) {
-    for(int a = 0; a < sizeof(inputsTab); a++) {
+    for(int a = 0; a < (int)sizeof(inputsTab); a++) {
       if(!digitalRead(inputsTab[a])) {
         while(!digitalRead(inputsTab[a])) {
           timerTick();
@@ -173,7 +190,7 @@ void restoreValuesFromEEPROM(void) {
   mute(values[V_MUTE]);
 
   int input = values[V_SELECTED_INPUT];
-  if(input > sizeof(inputsTab) - 1) {
+  if(input > (int)sizeof(inputsTab) - 1) {
     input = 0;
   }
   selectInput(input);
