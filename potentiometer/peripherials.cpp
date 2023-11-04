@@ -78,13 +78,31 @@ void encoderSupport(void) {
   }
 }
 
+void volumeUp(void) {
+  if(values[V_VOLUME] < MAX_VOLUME) {
+    if(!values[V_MUTE]) {
+      mute(true);
+    }
+    values[V_VOLUME]++;
+    redraw();
+  }
+}
+
+void volumeDown(void) {
+  if(values[V_VOLUME] > 0) {
+    if(!values[V_MUTE]) {
+      mute(true);
+    }
+    values[V_VOLUME]--;
+    redraw();
+  }      
+}
+
 void encoder(void) {
   if(isPowerON()) {
     delayMicroseconds(ENC_DEBOUNCE);
     int val = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
     if(val != lastVal) {
-      int volume = values[V_VOLUME];
-
       if(!values[V_MUTE]) {
         currentEncoderMillis = millis();
       }
@@ -96,12 +114,7 @@ void encoder(void) {
         (lastVal == 2 && val == 0 && support == 3) ||
         (lastVal == 0 && val == 2 && support == 2)) {
 
-        if(volume < MAX_VOLUME) {
-          if(!values[V_MUTE]) {
-            mute(true);
-          }
-          volume++;
-        }
+        volumeUp();
       } else
 
       if((lastVal == P_UNDETERMINED && val == 3 && support == P_UNDETERMINED) ||
@@ -113,18 +126,10 @@ void encoder(void) {
         (lastVal == 0 && val == 3 && support == 1) || 
         (lastVal == 3 && val == 0 && support == 2)) {
         
-        if(volume > 0) {
-          if(!values[V_MUTE]) {
-            mute(true);
-          }
-          volume--;
-        }      
+        volumeDown();
       }
 
       deb("%d %d %d", lastVal, val, support);
-
-      values[V_VOLUME] = volume;
-      redraw();
 
       lastVal = val;
     }
@@ -158,7 +163,7 @@ void setVol(int value) {
   }
 }
 
-int checkAndApplyInputs(void) {
+int readInputsKeyboardState(void) {
   if(isPowerON()) {
     for(int a = 0; a < (int)sizeof(inputsTab); a++) {
       if(!digitalRead(inputsTab[a])) {
@@ -170,6 +175,16 @@ int checkAndApplyInputs(void) {
     }
   }
   return -1;
+}
+
+int translateRC5ToInputState(int command) {
+  int selectedInput = -1;
+
+  if(command >= RC5_1 && command <= RC5_6) {
+    selectedInput = command - RC5_1;
+  }
+
+  return selectedInput;
 }
 
 void selectInput(int input) {

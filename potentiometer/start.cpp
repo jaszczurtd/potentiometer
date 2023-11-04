@@ -2,6 +2,8 @@
 #include "start.h"
 
 void powerSequence(bool state);
+void muteSequence(bool state);
+void inputSequence(int input);
 bool displayValues(void *v);
 bool volumeSave(void *v);
 bool enableSpeakers(void *v);
@@ -9,6 +11,7 @@ bool enableSoftPower(void *v);
 
 unsigned char values[MAX_VALUES];
 static int lastStoredVolume = P_UNDETERMINED;
+static unsigned long volumeRC5Millis = 0;
 static RC5 *rc5 = NULL;
 
 void setupTimers(void) {
@@ -66,38 +69,90 @@ bool callAtEverySecond(void *argument) {
   return true; 
 }
 
-void looper(void) {
+void looperSequence(void) {
   timerTick();
+  delay(CORE_OPERATION_DELAY);  
+}
 
-  int command = rc5Loop();
-  deb("rc5 command: %d", command);
+void looper(void) {
+
+  bool received = false;
+  int c = rc5Loop(), command = RC5_NONE;
+  if(c != RC5_NONE) {
+    received = true;
+    command = c;
+  }
+
+  bool loopControl = true;
+  while(received && loopControl) {
+    c = rc5Loop();
+    if(c == RC5_NONE) {
+      break;
+    }
+
+    switch(c) {
+      case RC5_VOLUME_DOWN:
+      case RC5_VOLUME_UP:
+        if(volumeRC5Millis == 0) {
+          volumeRC5Millis = millis() + TIME_DELAY_VOLUME_RC5_CONTROL;
+        }
+        loopControl = false;
+        break;
+      default:
+        break;
+    }
+
+    looperSequence();
+  }
 
   if(isPowerPressed()) {
     while(isPowerPressed()) {
-      timerTick();
+      looperSequence();
     }
+    powerSequence(!isPowerON());
+  }
+  if(command == RC5_POWER) {
     powerSequence(!isPowerON());
   }
 
   if(isPowerON()) {
     if(isMutePressed()) {
       while(isMutePressed()) {
-        timerTick();
+        looperSequence();
       }
-      values[V_MUTE] = !isMuteON();
-      mute(values[V_MUTE]);
-      storeValuesToEEPROM();
+      muteSequence(!isMuteON());
+    }
+    if(command == RC5_MUTE) {
+      muteSequence(!isMuteON());
     }
 
     if(!values[V_MUTE]) {
       muteWithEncoderSupport();
     }
 
-    int input = checkAndApplyInputs();
+    int input = readInputsKeyboardState();
     if(input != -1) {
-      selectInput(input);
-      values[V_SELECTED_INPUT] = input;
-      storeValuesToEEPROM();
+      inputSequence(input);
+    }
+
+    input = translateRC5ToInputState(command);
+    if(input != -1) {
+      inputSequence(input);
+    }
+
+    if(volumeRC5Millis > 0 &&
+      (command == RC5_VOLUME_UP || 
+      command == RC5_VOLUME_DOWN)) {
+
+      if(volumeRC5Millis < millis()) {
+        if(command == RC5_VOLUME_UP) {
+          volumeUp();
+        }
+        if(command == RC5_VOLUME_DOWN) {
+          volumeDown();
+        }
+        volumeRC5Millis = 0;
+      }
     }
 
     if(lastStoredVolume != values[V_VOLUME]) {
@@ -106,7 +161,7 @@ void looper(void) {
     }
   }
 
-  delay(CORE_OPERATION_DELAY);  
+  looperSequence();
 }
 
 void initialization1(void) {
@@ -136,6 +191,18 @@ void powerSequence(bool state) {
     mute(false);
     setupTimers();
   }
+}
+
+void muteSequence(bool state) {
+  values[V_MUTE] = state;
+  mute(values[V_MUTE]);
+  storeValuesToEEPROM();
+}
+
+void inputSequence(int input) {
+  selectInput(input);
+  values[V_SELECTED_INPUT] = input;
+  storeValuesToEEPROM();
 }
 
 static bool redrawScreen = false;

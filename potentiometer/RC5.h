@@ -13,6 +13,7 @@
 #include <Arduino.h>
 #include "tools.h"
 
+#define RC5_NONE 0
 #define RC5_POWER 12
 #define RC5_VOLUME_UP 16
 #define RC5_VOLUME_DOWN 17

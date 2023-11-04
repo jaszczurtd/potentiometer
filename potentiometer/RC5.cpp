@@ -78,7 +78,7 @@ static void callback(void) {
   }
 }
 
-static int rc5Command = 0;
+static int rc5Command = RC5_NONE;
 static unsigned long currentRC5Millis;
 
 static void rc5Result(unsigned char toggle, unsigned char address, unsigned char command) {
@@ -89,7 +89,7 @@ static void rc5Result(unsigned char toggle, unsigned char address, unsigned char
 int rc5Loop(void) {
   if(millis() > currentRC5Millis) {
     currentRC5Millis = 0;
-    rc5Command = 0;
+    rc5Command = RC5_NONE;
   }
   return rc5Command;
 }
