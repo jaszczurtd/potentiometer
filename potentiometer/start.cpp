@@ -6,10 +6,10 @@ bool displayValues(void *v);
 bool volumeSave(void *v);
 bool enableSpeakers(void *v);
 bool enableSoftPower(void *v);
-void rc5Result(unsigned char toggle, unsigned char address, unsigned char command);
 
 unsigned char values[MAX_VALUES];
 static int lastStoredVolume = P_UNDETERMINED;
+static RC5 *rc5 = NULL;
 
 void setupTimers(void) {
   int time = SECOND;
@@ -38,10 +38,8 @@ void initialization(void) {
 
   initBasicPIO();
   initPeripherials();
-  RC5 *rc5 = initRC5(RC5PIN);
-  rc5->setCallback(rc5Result);
-
-  //powerSequence(LOW);
+  rc5 = initRC5(RC5PIN);
+  rc5->setDefaultCallback();
 
   #ifdef I2C_SCANNER
   i2cScanner();
@@ -70,6 +68,9 @@ bool callAtEverySecond(void *argument) {
 
 void looper(void) {
   timerTick();
+
+  int command = rc5Loop();
+  deb("rc5 command: %d", command);
 
   if(isPowerPressed()) {
     while(isPowerPressed()) {
@@ -103,7 +104,6 @@ void looper(void) {
       lastStoredVolume = values[V_VOLUME];
       setVol(lastStoredVolume);
     }
-
   }
 
   delay(CORE_OPERATION_DELAY);  
@@ -184,12 +184,3 @@ bool enableSoftPower(void *v) {
   return false;
 }
 
-void rc5Result(unsigned char toggle, unsigned char address, unsigned char command) {
-
-
-  if(!toggle) {
-    deb("%d %d %d", toggle, address, command);
-
-  }
-
-}

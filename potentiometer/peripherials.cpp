@@ -60,15 +60,15 @@ void softPower(bool state) {
 
 static volatile int lastVal = P_UNDETERMINED;
 static volatile int support = P_UNDETERMINED;
-static volatile unsigned long previousMillis = 0; 
-static volatile unsigned long currentMillis;
+static volatile unsigned long previousEncoderMillis = 0; 
+static volatile unsigned long currentEncoderMillis;
 
 void encInit(void) {
   pinMode(PIN_ENC_L, INPUT_PULLUP);
   pinMode(PIN_ENC_R, INPUT_PULLUP);
   attachInterrupt(PIN_ENC_R, encoder, CHANGE);
   attachInterrupt(PIN_ENC_L, encoderSupport, CHANGE);
-  currentMillis = millis();
+  currentEncoderMillis = millis();
 }
 
 void encoderSupport(void) {
@@ -86,7 +86,7 @@ void encoder(void) {
       int volume = values[V_VOLUME];
 
       if(!values[V_MUTE]) {
-        currentMillis = millis();
+        currentEncoderMillis = millis();
       }
 
       if((lastVal == P_UNDETERMINED && val == 2 && support == P_UNDETERMINED) || 
@@ -133,7 +133,7 @@ void encoder(void) {
 
 void muteWithEncoderSupport(void) {
   if(isPowerON()) {
-    if (currentMillis - previousMillis >= MUTE_FOR_CHANGE_VOLUME) {
+    if (currentEncoderMillis - previousEncoderMillis >= MUTE_FOR_CHANGE_VOLUME) {
       mute(false);
     }
   }

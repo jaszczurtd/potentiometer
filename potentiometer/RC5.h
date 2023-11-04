@@ -37,6 +37,7 @@ class RC5
 
     RC5(unsigned char pin);
     void setCallback(void(*function)(unsigned char toggle, unsigned char address, unsigned char command));
+    void setDefaultCallback(void);
     void reset();
     bool read(unsigned int *message);
     bool read(unsigned char *toggle, unsigned char *address, unsigned char *command);
@@ -45,5 +46,6 @@ class RC5
 };
 
 RC5 *initRC5(int pin);
+int rc5Loop(void);
 
 #endif // RC5_h

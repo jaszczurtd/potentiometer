@@ -78,12 +78,32 @@ static void callback(void) {
   }
 }
 
+static int rc5Command = 0;
+static unsigned long currentRC5Millis;
+
+static void rc5Result(unsigned char toggle, unsigned char address, unsigned char command) {
+  rc5Command = (int)command;
+  currentRC5Millis = millis() + RC5_PROBE_TIME;
+}
+
+int rc5Loop(void) {
+  if(millis() > currentRC5Millis) {
+    currentRC5Millis = 0;
+    rc5Command = 0;
+  }
+  return rc5Command;
+}
+
 RC5::RC5(unsigned char p) {
   pin = p;
   targetCallback = NULL;
   pinMode(pin, INPUT_PULLUP);
   attachInterrupt(pin, callback, CHANGE);
   reset();
+}
+
+void RC5::setDefaultCallback(void) {
+  setCallback(rc5Result);
 }
 
 void RC5::setCallback(void(*function)(unsigned char toggle, unsigned char address, unsigned char command)) {
