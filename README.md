@@ -3,9 +3,13 @@ Electronic potentiometer / input selector project for an amplifier, based on RP2
 
 ### How to compile?
 Download & install Arduino IDE 2.2.x
+
 install arduino-pico: https://github.com/earlephilhower/arduino-pico
+
 install Adafruit ILI9341 and its dependiences
+
 install Adafruit GFX_Library
+
 install arduino-timer (by Michael Contreras)
 
 ### How does it work?
