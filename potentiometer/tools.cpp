@@ -80,7 +80,6 @@ void cancelTimerTasks(void) {
   generalTimer.cancel();
 }
 
-static unsigned char pcf8574State = 0;
 static int pcf_addrs[] = {
   PCF8574_ADDR_1, PCF8574_ADDR_2, PCF8574_ADDR_3, PCF8574_ADDR_4, PCF8574_ADDR_5, PCF8574_ADDR_6
 };

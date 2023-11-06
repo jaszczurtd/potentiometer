@@ -31,7 +31,7 @@ class RC5
     unsigned char pin;
     unsigned char state;
     unsigned long time0;
-    unsigned long lastValue;
+    int lastValue;
     unsigned int bits;
     unsigned int command;
     void (*targetCallback)(unsigned char toggle, unsigned char address, unsigned char command);
