@@ -24,7 +24,7 @@
 #define C_GRAY_DARK 0x4208
 #define C_GRAY_MEDIUM 0xA514
 
-#define ICONS_BG_COLOR 0x0841
+#define ICONS_BG_COLOR 0x0000
 
 class TFTExtension : public Adafruit_ILI9341 {
 public:
@@ -50,6 +50,6 @@ private:
 TFT *initTFT(void);
 TFT *returnTFTReference(void);
 void softInitDisplay(void);
-void redrawAllGauges(void);
+void clearScreen(void);
 
 #endif

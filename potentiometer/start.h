@@ -13,6 +13,7 @@
 #include "TFTExtension.h"
 #include "hardwareConfig.h"
 #include "peripherials.h"
+#include "gfx.h"
 
 extern unsigned char values[];
 

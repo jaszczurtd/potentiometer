@@ -8,11 +8,14 @@ bool displayValues(void *v);
 bool volumeSave(void *v);
 bool enableSpeakers(void *v);
 bool enableSoftPower(void *v);
+bool enableLoading(void *v);
+void drawLoadingSequence(int amount);
 
 unsigned char values[MAX_VALUES];
 static int lastStoredVolume = P_UNDETERMINED;
 static unsigned long volumeRC5Millis = 0;
 static RC5 *rc5 = NULL;
+static bool isLoaded = false;
 
 void setupTimers(void) {
   int time = SECOND;
@@ -176,15 +179,26 @@ void looper1(void) {
 void powerSequence(bool state) {
   power(state);
   if(state) {
+    TFT *tft = returnTFTReference();
+    isLoaded = false;
     softInitDisplay();
-    redraw();
     restoreValuesFromEEPROM();
     lastStoredVolume = values[V_VOLUME];
     setVol(values[V_VOLUME]); 
     launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
     launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
+    launchTaskAt(TIME_INTRO_TIME_KERNEL_ACOUSTIC * SECOND, enableLoading);
+
+    clearScreen();
+    const int x = (SCREEN_W - WSTEP_KERNEL_ACOUSTIC_WIDTH) / 2;
+    const int y = (SCREEN_H - WSTEP_KERNEL_ACOUSTIC_HEIGHT) / 2;
+    tft->drawImage(x, y, WSTEP_KERNEL_ACOUSTIC_WIDTH,
+                    WSTEP_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR,
+                    (unsigned short*)wstep_kernel_acoustic);
   } else {
+    isLoaded = false;
     cancelTimerTasks();
+    clearScreen();
     speakers(false);
     softPower(false);
     pcf8574_init();
@@ -213,6 +227,9 @@ void redraw(void) {
 bool displayValues(void *v) {
 
   if(!isPowerON()){
+    return true;
+  }
+  if(!isLoaded) {
     return true;
   }
 
@@ -251,3 +268,39 @@ bool enableSoftPower(void *v) {
   return false;
 }
 
+bool enableLoading(void *v) {
+
+  int x, y;
+  TFT *tft = returnTFTReference();
+
+  x = (SCREEN_W - WSTEP_KERNEL_ACOUSTIC_WIDTH) / 2;
+  y = (SCREEN_H - WSTEP_KERNEL_ACOUSTIC_HEIGHT) / 2;
+  tft->fillRect(x, y, WSTEP_KERNEL_ACOUSTIC_WIDTH,
+                WSTEP_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR);
+
+  x = (SCREEN_W - LOAD_KERNEL_ACOUSTIC_WIDTH) / 2;
+  y = ((SCREEN_H - LOAD_KERNEL_ACOUSTIC_HEIGHT) / 2) / 1.3;
+  tft->drawImage(x, y, LOAD_KERNEL_ACOUSTIC_WIDTH,
+                  LOAD_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR,
+                  (unsigned short*)load_kernel_acoustic);
+
+  drawLoadingSequence(4);
+
+//  isLoaded = true;
+
+  deb("loading...");
+
+  return false;
+}
+
+void drawLoadingSequence(int amount) {
+  int x, y;
+  TFT *tft = returnTFTReference();
+
+
+  x = LOADING_X;
+  y = LOADING_Y;
+  tft->drawImage(x, y, LOADING_WIDTH,
+                  LOADING_HEIGHT, ICONS_BG_COLOR,
+                  (unsigned short*)loading);
+}

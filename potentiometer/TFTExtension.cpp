@@ -22,8 +22,9 @@ void softInitDisplay(void) {
   tft->setRotation(1);
 }
 
-void redrawAllGauges(void) {
-
+void clearScreen(void) {
+  TFT *tft = returnTFTReference();
+  tft->fillScreen(ICONS_BG_COLOR);
 }
 
 TFTExtension::TFTExtension(uint8_t cs, uint8_t dc, uint8_t rst) : Adafruit_ILI9341(cs, dc, rst) { }
