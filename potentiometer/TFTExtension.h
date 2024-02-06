@@ -42,6 +42,8 @@ void defaultFontWithPosAndColor(int x, int y, int color);
 void setTextSizeOneWithColor(int color);
 void sansBoldWithPosAndColor(int x, int y, int color);
 void serif9ptWithColor(int color);
+void drawRGBBitmapTransparent(int16_t x, int16_t y, const uint16_t bitmap[],
+                              int16_t w, int16_t h, uint16_t transparency);
 
 private:
   char displayTxt[32];

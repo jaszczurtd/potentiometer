@@ -141,4 +141,17 @@ void TFTExtension::serif9ptWithColor(int color) {
   setTextSizeOneWithColor(color);
 }
 
+void TFTExtension::drawRGBBitmapTransparent(int16_t x, int16_t y, const uint16_t bitmap[],
+                                            int16_t w, int16_t h, uint16_t transparency) {
+  startWrite();
+  for (int16_t j = 0; j < h; j++, y++) {
+    for (int16_t i = 0; i < w; i++) {
+      uint16_t color = pgm_read_word(&bitmap[j * w + i]);
+      if(transparency != color) {
+        writePixel(x + i, y, color);
+      }
+    }
+  }
+  endWrite();
+}
 

@@ -185,6 +185,37 @@ int readAT24Int(unsigned int dataAddress) {
           (readAT24(dataAddress + 3));
 }
 
+unsigned short rgbToRgb565(unsigned char r, unsigned char g, unsigned char b) {
+    unsigned short r5 = (r >> 3) & 0x1F;
+    unsigned short g6 = (g >> 2) & 0x3F;
+    unsigned short b5 = (b >> 3) & 0x1F;
+    
+    return (r5 << 11) | (g6 << 5) | b5;
+}
+
+unsigned int interpolateColor(unsigned int color1, unsigned int color2, float ratio) {
+  unsigned char r1 = (color1 >> 16) & 0xFF;
+  unsigned char g1 = (color1 >> 8) & 0xFF;
+  unsigned char b1 = color1 & 0xFF;
+
+  unsigned char r2 = (color2 >> 16) & 0xFF;
+  unsigned char g2 = (color2 >> 8) & 0xFF;
+  unsigned char b2 = color2 & 0xFF;
+
+  unsigned char r = r1 + (r2 - r1) * ratio;
+  unsigned char g = g1 + (g2 - g1) * ratio;
+  unsigned char b = b1 + (b2 - b1) * ratio;
+
+  return rgbToRgb565(r, g, b);
+}
+
+void generateGradient(unsigned int *tab, int colorStart, int colorEnd, int steps) {
+  float stepRatio = 1.0 / (steps - 1);
+  for (int i = 0; i < steps; ++i) {
+      tab[i] = interpolateColor(colorStart, colorEnd, i * stepRatio);
+  }
+}
+
 #ifdef I2C_SCANNER
 unsigned int loopCounter = 0;
 static bool t = false;

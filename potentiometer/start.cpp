@@ -17,6 +17,8 @@ static unsigned long volumeRC5Millis = 0;
 static RC5 *rc5 = NULL;
 static bool isLoaded = false;
 
+unsigned int loadingGradient[LOADING_STEPS];
+
 void setupTimers(void) {
   int time = SECOND;
   createTimerObject();
@@ -53,6 +55,7 @@ void initialization(void) {
 
   tft->fillScreen(ICONS_BG_COLOR);
 
+  generateGradient(loadingGradient, LOADING_COLOR_1, LOADING_COLOR_2, LOADING_STEPS);
   setupTimers();
 
   callAtEverySecond(NULL);
@@ -284,7 +287,7 @@ bool enableLoading(void *v) {
                   LOAD_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR,
                   (unsigned short*)load_kernel_acoustic);
 
-  drawLoadingSequence(4);
+  drawLoadingSequence(42);
 
 //  isLoaded = true;
 
@@ -297,10 +300,14 @@ void drawLoadingSequence(int amount) {
   int x, y;
   TFT *tft = returnTFTReference();
 
+  y = LOADING_BAR_Y;
+  for(int a = 0; a < amount; a++) {
+    x = LOADING_BAR_X + (a * LOADING_BAR_X_OFFSET);
+    tft->drawLine(x, y, x, y + LOADING_BAR_HEIGHT, loadingGradient[a]);
+  }
 
   x = LOADING_X;
   y = LOADING_Y;
-  tft->drawImage(x, y, LOADING_WIDTH,
-                  LOADING_HEIGHT, ICONS_BG_COLOR,
-                  (unsigned short*)loading);
+  tft->drawRGBBitmapTransparent(x, y, (unsigned short*)loading,
+                                LOADING_WIDTH, LOADING_HEIGHT, ICONS_BG_COLOR);
 }
