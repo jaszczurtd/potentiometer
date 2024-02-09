@@ -33,6 +33,7 @@ void looper(void);
 void looper1(void);
 bool seriousAlertSwitch(void);
 bool alertSwitch(void);
-void redraw(void);
+void redrawVolume(void);
+void redrawInput(void);
 
 #endif

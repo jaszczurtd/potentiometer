@@ -3,6 +3,10 @@
 
 //#define I2C_SCANNER
 
+#define SKIP_INTRO
+#define SKIP_OFF
+#define SKIP_OFF_SECONDS_TO_START 2
+
 #define WATCHDOG_TIME 4000
 #define UNSYNCHRONIZE_TIME 15
 #define CORE_OPERATION_DELAY 1
@@ -19,6 +23,7 @@
 #define LOADING_COLOR_1 0x002a2a
 #define LOADING_COLOR_2 0x7fc8c7
 #define LOADING_STEPS 42
+#define AMOUNT_BARS_UNTIL_LOGO 15 //loading bar steps
 #define TIME_DELAY_VOLUME_RC5_CONTROL 200
 
 //in ms

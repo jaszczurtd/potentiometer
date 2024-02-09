@@ -12,6 +12,7 @@ bool enableLoading(void *v);
 bool loadingProgress(void *v);
 void drawLoadingSequence(int amount);
 bool lastStepLoading(void *v);
+bool enableOn(void *v);
 
 unsigned char values[MAX_VALUES];
 static int lastStoredVolume = P_UNDETERMINED;
@@ -62,6 +63,10 @@ void initialization(void) {
   setupTimers();
 
   callAtEverySecond(NULL);
+
+#ifdef SKIP_OFF
+  launchTaskAt(SKIP_OFF_SECONDS_TO_START * SECOND, enableOn);
+#endif
 }
 
 static bool alertBlink = false;
@@ -201,8 +206,12 @@ void powerSequence(bool state) {
     softInitDisplay();
     launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
     launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
+#ifdef SKIP_INTRO
+    lastStepLoading(NULL);
+#else
     launchTaskAt(TIME_INTRO_TIME_KERNEL_ACOUSTIC * SECOND, enableLoading);
     showKernelAcousticLogo();
+#endif
   } else {
     cancelTimerTasks();
     clearScreen();
@@ -224,11 +233,31 @@ void inputSequence(int input) {
   selectInput(input);
   values[V_SELECTED_INPUT] = input;
   storeValuesToEEPROM();
+  redrawInput();
 }
 
-static bool redrawScreen = false;
-void redraw(void) {
-  redrawScreen = true;
+static bool redrawVol = true;
+static bool redrawVolNumber = true;
+static bool redrawInpt = true;
+static bool redrawInptNumber = true;
+static bool redrawVolBar = true;
+
+void redrawScreen(void) {
+  clearScreen();
+  redrawVol = true;
+  redrawVolNumber = true;
+  redrawInpt = true;
+  redrawInptNumber = true;
+  redrawVolBar = true;
+}
+
+void redrawVolume(void) {
+  redrawVolNumber = true;
+  redrawVolBar = true;
+}
+
+void redrawInput(void) {
+  redrawInptNumber = true;
 }
 
 bool displayValues(void *v) {
@@ -239,18 +268,35 @@ bool displayValues(void *v) {
   if(!isLoaded) {
     return true;
   }
+  TFT *tft = returnTFTReference();
+  int x, y;
 
-  if(redrawScreen) {
-    TFT *tft = returnTFTReference();
+  if(redrawInpt) {
+    x = INPUT_G_X;
+    y = INPUT_G_Y;
+    tft->drawImage(x, y, INPUT_G_WIDTH, INPUT_G_HEIGHT, ICONS_BG_COLOR,
+                    (unsigned short*)input_g);
+    redrawInpt = false;
+  }
 
-    tft->prepareText("volume: %d", values[V_VOLUME]);
-    tft->fillRect(0, 0, 160, 100, ICONS_BG_COLOR);
-    tft->sansBoldWithPosAndColor(10, 30, 0xffffff);
-    tft->printlnFromPreparedText();
-    redrawScreen = false;
+  if(redrawInptNumber) {
+    const unsigned short *input_numbers[] = {
+      input_d_1, input_d_2, input_d_3, input_d_4, input_d_5, input_d_6
+    };
+    
+    x = INPUT_D_X;
+    y = INPUT_D_Y;
+    tft->drawImage(x, y, INPUT_D_WIDTH, INPUT_D_HEIGHT, ICONS_BG_COLOR,
+                  (unsigned short*)input_numbers[values[V_SELECTED_INPUT]]);
+    redrawInptNumber = false;
   }
 
   return true;
+}
+
+bool enableOn(void *v) {
+  powerSequence(true);
+  return false;
 }
 
 static int lastVolume = 0;
@@ -300,18 +346,25 @@ bool enableLoading(void *v) {
 
 void drawLoadingSequence(int amount) {
   int x, y;
+  int a = 0;
   TFT *tft = returnTFTReference();
 
+  if(amount >= AMOUNT_BARS_UNTIL_LOGO) {
+    a = amount - 1;
+  }
+
   y = LOADING_BAR_Y;
-  for(int a = 0; a < amount; a++) {
+  for(; a < amount; a++) {
     x = LOADING_BAR_X + (a * LOADING_BAR_X_OFFSET);
     tft->drawLine(x, y, x, y + LOADING_BAR_HEIGHT, loadingGradient[a]);
   }
 
-  x = LOADING_X;
-  y = LOADING_Y;
-  tft->drawRGBBitmapTransparent(x, y, (unsigned short*)loading,
-                                LOADING_WIDTH, LOADING_HEIGHT, ICONS_BG_COLOR);
+  if(amount <= AMOUNT_BARS_UNTIL_LOGO) {
+    x = LOADING_X;
+    y = LOADING_Y;
+    tft->drawRGBBitmapTransparent(x, y, (unsigned short*)loading,
+                                  LOADING_WIDTH, LOADING_HEIGHT, ICONS_BG_COLOR);
+  }
 }
 
 bool loadingProgress(void *v) {
@@ -330,7 +383,7 @@ bool lastStepLoading(void *v) {
   setVol(values[V_VOLUME]); 
 
   isLoaded = true;
-  redraw();
+  redrawScreen();
 
   return false;
 }

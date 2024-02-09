@@ -84,7 +84,7 @@ void volumeUp(void) {
       mute(true);
     }
     values[V_VOLUME]++;
-    redraw();
+    redrawVolume();
   }
 }
 
@@ -94,7 +94,7 @@ void volumeDown(void) {
       mute(true);
     }
     values[V_VOLUME]--;
-    redraw();
+    redrawVolume();
   }      
 }
 
