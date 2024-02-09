@@ -9,13 +9,16 @@ bool volumeSave(void *v);
 bool enableSpeakers(void *v);
 bool enableSoftPower(void *v);
 bool enableLoading(void *v);
+bool loadingProgress(void *v);
 void drawLoadingSequence(int amount);
+bool lastStepLoading(void *v);
 
 unsigned char values[MAX_VALUES];
 static int lastStoredVolume = P_UNDETERMINED;
 static unsigned long volumeRC5Millis = 0;
 static RC5 *rc5 = NULL;
 static bool isLoaded = false;
+static int loadingCounter = 0;
 
 unsigned int loadingGradient[LOADING_STEPS];
 
@@ -179,27 +182,28 @@ void looper1(void) {
   delay(CORE_OPERATION_DELAY);  
 }
 
+void showKernelAcousticLogo(void) {
+  TFT *tft = returnTFTReference();
+  clearScreen();
+  const int x = (SCREEN_W - WSTEP_KERNEL_ACOUSTIC_WIDTH) / 2;
+  const int y = (SCREEN_H - WSTEP_KERNEL_ACOUSTIC_HEIGHT) / 2;
+  tft->drawImage(x, y, WSTEP_KERNEL_ACOUSTIC_WIDTH,
+                  WSTEP_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR,
+                  (unsigned short*)wstep_kernel_acoustic);
+}
+
 void powerSequence(bool state) {
   power(state);
+  loadingCounter = 0;
+  isLoaded = false;
+
   if(state) {
-    TFT *tft = returnTFTReference();
-    isLoaded = false;
     softInitDisplay();
-    restoreValuesFromEEPROM();
-    lastStoredVolume = values[V_VOLUME];
-    setVol(values[V_VOLUME]); 
     launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
     launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
     launchTaskAt(TIME_INTRO_TIME_KERNEL_ACOUSTIC * SECOND, enableLoading);
-
-    clearScreen();
-    const int x = (SCREEN_W - WSTEP_KERNEL_ACOUSTIC_WIDTH) / 2;
-    const int y = (SCREEN_H - WSTEP_KERNEL_ACOUSTIC_HEIGHT) / 2;
-    tft->drawImage(x, y, WSTEP_KERNEL_ACOUSTIC_WIDTH,
-                    WSTEP_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR,
-                    (unsigned short*)wstep_kernel_acoustic);
+    showKernelAcousticLogo();
   } else {
-    isLoaded = false;
     cancelTimerTasks();
     clearScreen();
     speakers(false);
@@ -287,11 +291,9 @@ bool enableLoading(void *v) {
                   LOAD_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR,
                   (unsigned short*)load_kernel_acoustic);
 
-  drawLoadingSequence(42);
-
-//  isLoaded = true;
-
-  deb("loading...");
+  drawLoadingSequence(loadingCounter++);
+  setupTimerWith(UNSYNCHRONIZE_TIME, int(float(float(TIME_LOAD) / float(LOADING_STEPS)) * SECOND),
+                        loadingProgress);
 
   return false;
 }
@@ -311,3 +313,25 @@ void drawLoadingSequence(int amount) {
   tft->drawRGBBitmapTransparent(x, y, (unsigned short*)loading,
                                 LOADING_WIDTH, LOADING_HEIGHT, ICONS_BG_COLOR);
 }
+
+bool loadingProgress(void *v) {
+  drawLoadingSequence(loadingCounter++);
+  if(loadingCounter > LOADING_STEPS) {
+    launchTaskAt(TIME_INTRO_TIME_KERNEL_ACOUSTIC * SECOND, lastStepLoading);
+    showKernelAcousticLogo();
+    return false;
+  }
+  return true;
+}
+
+bool lastStepLoading(void *v) {
+  restoreValuesFromEEPROM();
+  lastStoredVolume = values[V_VOLUME];
+  setVol(values[V_VOLUME]); 
+
+  isLoaded = true;
+  redraw();
+
+  return false;
+}
+

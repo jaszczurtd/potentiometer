@@ -70,6 +70,7 @@ void timerTick(void) {
 
 void setupTimerWith(unsigned long ut, unsigned long time, bool(*function)(void *argument)) {
   generalTimer.every(time, function);
+  delay(CORE_OPERATION_DELAY);
 }
 
 void launchTaskAt(unsigned long time, bool(*function)(void *argument)) {
