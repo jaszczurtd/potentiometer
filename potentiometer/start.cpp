@@ -291,6 +291,14 @@ bool displayValues(void *v) {
     redrawInptNumber = false;
   }
 
+  if(redrawVol) {
+    x = VOLUME_G_X;
+    y = VOLUME_G_Y;
+    tft->drawImage(x, y, VOLUME_G_WIDTH, VOLUME_G_HEIGHT, ICONS_BG_COLOR,
+                  (unsigned short*)volume_g);
+    redrawVol = false;
+  }
+
   return true;
 }
 
