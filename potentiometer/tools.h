@@ -40,6 +40,7 @@ byte readAT24(unsigned int dataAddress);
 void writeAT24Int(unsigned int dataAddress, int dataVal);
 int readAT24Int(unsigned int dataAddress);
 unsigned short rgbToRgb565(unsigned char r, unsigned char g, unsigned char b);
+unsigned short vrgbToRgb565(unsigned int color);
 void generateGradient(unsigned int *tab, int colorStart, int colorEnd, int steps);
 
 #ifdef I2C_SCANNER

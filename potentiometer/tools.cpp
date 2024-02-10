@@ -187,11 +187,22 @@ int readAT24Int(unsigned int dataAddress) {
 }
 
 unsigned short rgbToRgb565(unsigned char r, unsigned char g, unsigned char b) {
-    unsigned short r5 = (r >> 3) & 0x1F;
-    unsigned short g6 = (g >> 2) & 0x3F;
-    unsigned short b5 = (b >> 3) & 0x1F;
-    
-    return (r5 << 11) | (g6 << 5) | b5;
+  unsigned short r5 = (r * 31 + 127) / 255;
+  unsigned short g6 = (g * 63 + 127) / 255;
+  unsigned short b5 = (b * 31 + 127) / 255;
+
+  r5 = r5 > 31 ? 31 : r5;
+  g6 = g6 > 63 ? 63 : g6;
+  b5 = b5 > 31 ? 31 : b5;
+
+  return (r5 << 11) | (g6 << 5) | b5;
+}
+
+unsigned short vrgbToRgb565(unsigned int color) {
+  unsigned char r = (color >> 16) & 0xFF;
+  unsigned char g = (color >> 8) & 0xFF;
+  unsigned char b = color & 0xFF;  
+  return rgbToRgb565(r, g, b);
 }
 
 unsigned int interpolateColor(unsigned int color1, unsigned int color2, float ratio) {

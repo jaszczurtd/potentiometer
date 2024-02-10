@@ -80,6 +80,28 @@ void redrawInput(void) {
   redrawInptNumber = true;
 }
 
+void drawLineSection(int x, int y, int sections, uint16_t color) {
+  TFT *tft = returnTFTReference();
+
+  for (int i = 0; i < sections; i++) {
+    int x1 = x + i * VOLUME_BAR_OFFSET;
+    tft->drawLine(x1, y, x1, y + VOL_BAR_HEIGHT, color);
+  }
+}
+
+void drawVolumeBar(int x, int y, int val) {
+  int area_0 = (val > SECTION_0) ? SECTION_0 : val;
+  int area_1 = (val > SECTION_0) ? ((val - SECTION_0 > SECTION_1) ? SECTION_1 : val - SECTION_0) : 0;
+  int area_2 = (val > SECTION_M) ? (val - SECTION_M) : 0;
+
+  drawLineSection(x, y, area_0, vrgbToRgb565(VOL_MIN_ON));
+  drawLineSection(x + area_0 * VOLUME_BAR_OFFSET, y, SECTION_0 - area_0, vrgbToRgb565(VOL_MIN_OFF));
+  drawLineSection(x + SECTION_0 * VOLUME_BAR_OFFSET, y, area_1, vrgbToRgb565(VOL_MIDDLE_ON));
+  drawLineSection(x + (SECTION_0 + area_1) * VOLUME_BAR_OFFSET, y, SECTION_1 - area_1, vrgbToRgb565(VOL_MIDDLE_OFF));
+  drawLineSection(x + SECTION_M * VOLUME_BAR_OFFSET, y, area_2, vrgbToRgb565(VOL_MAX_ON));
+  drawLineSection(x + (SECTION_M + area_2) * VOLUME_BAR_OFFSET, y, SECTION_2 - area_2, vrgbToRgb565(VOL_MAX_OFF));
+}
+
 const unsigned short *vol_numbers[] = {
   vol_0, vol_1, vol_2, vol_3, vol_4, vol_5, vol_6, vol_7, vol_8, vol_9
 };
@@ -134,7 +156,7 @@ bool displayValues(void *v) {
                     (unsigned short*)vol_numbers[l]);
     }
     int r = values[V_VOLUME] % 10;
-    x += VOL_DIGIT_WIDTH + 24;
+    x += VOL_DIGIT_WIDTH + VOL_DIGIT_OFFSET;
 
     if(lastR != r) {
       lastR = r;
@@ -143,6 +165,11 @@ bool displayValues(void *v) {
     }
 
     redrawVolNumber = false;
+  }
+
+  if(redrawVolBar) {
+    drawVolumeBar(VOLUME_BAR_X, VOLUME_BAR_Y, values[V_VOLUME]);
+    redrawVolBar = false;
   }
 
   return true;

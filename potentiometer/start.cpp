@@ -27,7 +27,7 @@ void setupTimers(void) {
   int time = SECOND;
   createTimerObject();
   setupTimerWith(UNSYNCHRONIZE_TIME, time, callAtEverySecond);
-  setupTimerWith(UNSYNCHRONIZE_TIME, time / 8, displayValues);
+  setupTimerWith(UNSYNCHRONIZE_TIME, time / 10, displayValues);
   setupTimerWith(UNSYNCHRONIZE_TIME, time / 4, volumeSave);
 }
 
