@@ -1,7 +1,7 @@
 #ifndef T_HARDWARECONFIG
 #define T_HARDWARECONFIG
 
-#define I2C_SPEED_HZ 50000
+#define I2C_SPEED_HZ 150000
 
 #define PIN_SDA 0
 #define PIN_SCL 1

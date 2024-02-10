@@ -3,10 +3,12 @@
 
 //#define I2C_SCANNER
 
+//those defined only for debug
 #define SKIP_INTRO
 #define SKIP_OFF
 #define SKIP_OFF_SECONDS_TO_START 2
 
+//general system constants
 #define WATCHDOG_TIME 4000
 #define UNSYNCHRONIZE_TIME 15
 #define CORE_OPERATION_DELAY 1

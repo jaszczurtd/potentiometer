@@ -17,6 +17,7 @@
 
 extern unsigned char values[];
 
+bool isSystemLoaded(void);
 void drawMediumImportanceValues(void);
 void drawHighImportanceValues(void);
 void drawLowImportanceValues(void);
@@ -33,7 +34,5 @@ void looper(void);
 void looper1(void);
 bool seriousAlertSwitch(void);
 bool alertSwitch(void);
-void redrawVolume(void);
-void redrawInput(void);
 
 #endif
