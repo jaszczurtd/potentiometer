@@ -10,6 +10,12 @@ static bool redrawVolBar = true;
 static int lastL = -1;
 static int lastR = -1;
 
+static bool redrawMute = false;
+static bool muteState = false;
+static bool muteDrawn = false;
+
+static unsigned long muteTime = 0;
+
 unsigned int loadingGradient[LOADING_STEPS];
 
 void drawSmallKernelAcousticLogo(void) {
@@ -80,6 +86,14 @@ void redrawInput(void) {
   redrawInptNumber = true;
 }
 
+void drawMute(bool state) {
+  redrawMute = true;
+  muteState = state;
+  clearScreen();
+  muteDrawn = false;
+  muteTime = millis() + (SECOND * MUTE_TIME_DISPLAY);
+}
+
 void drawLineSection(int x, int y, int sections, uint16_t color) {
   TFT *tft = returnTFTReference();
 
@@ -116,6 +130,37 @@ bool displayValues(void *v) {
   }
   TFT *tft = returnTFTReference();
   int x, y;
+
+  if(redrawMute) {
+    if(muteTime < millis()) {
+      redrawMute = false;
+      redrawScreen();
+    }
+
+    if(!muteDrawn) {
+      unsigned short *mute = NULL;
+      int w = 0, h = 0;
+      if(muteState) {
+        x = (SCREEN_W - MUTE_WIDTH) / 2;
+        y = (SCREEN_H - MUTE_HEIGHT) / 2;
+        w = MUTE_WIDTH;
+        h = MUTE_HEIGHT;
+        mute = (unsigned short *)mute_g;
+      } else {
+        x = (SCREEN_W - MUTE_OFF_WIDTH) / 2;
+        y = (SCREEN_H - MUTE_OFF_HEIGHT) / 2;
+        w = MUTE_OFF_WIDTH;
+        h = MUTE_OFF_HEIGHT;
+        mute = (unsigned short *)mute_off_g;
+      }
+      tft->drawImage(x, y, w, h, ICONS_BG_COLOR,
+                    (unsigned short*)mute);
+
+      muteDrawn = true;
+    }
+
+    return true;
+  }
 
   if(redrawInpt) {
     x = INPUT_G_X;

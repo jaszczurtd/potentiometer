@@ -135,6 +135,7 @@ void looper(void) {
     }
     if(command == RC5_MUTE) {
       muteSequence(!isMuteON());
+      drawMute(isMuteON());
     }
 
     if(!values[V_MUTE]) {
