@@ -7,6 +7,9 @@ static bool redrawInpt = true;
 static bool redrawInptNumber = true;
 static bool redrawVolBar = true;
 
+static int lastL = -1;
+static int lastR = -1;
+
 unsigned int loadingGradient[LOADING_STEPS];
 
 void drawSmallKernelAcousticLogo(void) {
@@ -60,6 +63,7 @@ void drawLoadingSequence(int amount) {
 
 void redrawScreen(void) {
   clearScreen();
+  lastR = lastL = -1;
   redrawVol = true;
   redrawVolNumber = true;
   redrawInpt = true;
@@ -117,6 +121,28 @@ bool displayValues(void *v) {
     tft->drawImage(x, y, VOLUME_G_WIDTH, VOLUME_G_HEIGHT, ICONS_BG_COLOR,
                   (unsigned short*)volume_g);
     redrawVol = false;
+  }
+
+  if(redrawVolNumber) {
+    x = VOL_DIGIT_X;
+    y = VOL_DIGIT_Y;
+
+    int l = values[V_VOLUME] / 10;
+    if(lastL != l) {
+      lastL = l;
+      tft->drawImage(x, y, VOL_DIGIT_WIDTH, VOL_DIGIT_HEIGHT, ICONS_BG_COLOR,
+                    (unsigned short*)vol_numbers[l]);
+    }
+    int r = values[V_VOLUME] % 10;
+    x += VOL_DIGIT_WIDTH + 24;
+
+    if(lastR != r) {
+      lastR = r;
+      tft->drawImage(x, y, VOL_DIGIT_WIDTH, VOL_DIGIT_HEIGHT, ICONS_BG_COLOR,
+                    (unsigned short*)vol_numbers[r]);
+    }
+
+    redrawVolNumber = false;
   }
 
   return true;
