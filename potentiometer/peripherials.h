@@ -15,7 +15,7 @@ extern unsigned char values[];
 
 #define P_UNDETERMINED -1
 #define MUTE_FOR_CHANGE_VOLUME 200 //ms
-#define ENC_DEBOUNCE 5 //us
+#define ENC_DEBOUNCE 4 //us
 
 #define V_VOLUME 0
 #define V_MUTE 1
@@ -40,6 +40,7 @@ int translateRC5ToInputState(int command);
 void selectInput(int input);
 void storeValuesToEEPROM(void);
 void restoreValuesFromEEPROM(void);
+void setupErrorDetection(void);
 
 #endif
 

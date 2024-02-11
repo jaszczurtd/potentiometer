@@ -51,6 +51,8 @@
 #define PIN_INPUT_5 12
 #define PIN_INPUT_6 13
 
-#define RC5PIN 20
+#define PIN_RC5 20
+
+#define PIN_ERROR 8
 
 #endif

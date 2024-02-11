@@ -4,6 +4,7 @@
 void encoder(void);
 void encoderSupport(void);
 void encInit(void);
+void errorInt(void);
 
 static unsigned char inputsTab[] = {
   PIN_INPUT_6, PIN_INPUT_5, PIN_INPUT_4, PIN_INPUT_3, PIN_INPUT_1, PIN_INPUT_2
@@ -112,6 +113,7 @@ void encoder(void) {
         (lastVal == 2 && val == 0 && support == 0) || 
         (lastVal == 0 && val == 2 && support == 0) ||
         (lastVal == 2 && val == 0 && support == 3) ||
+        (lastVal == 3 && val == 0 && support == 0) ||
         (lastVal == 0 && val == 2 && support == 2)) {
 
         volumeUp();
@@ -120,7 +122,6 @@ void encoder(void) {
       if((lastVal == P_UNDETERMINED && val == 3 && support == P_UNDETERMINED) ||
         (lastVal == P_UNDETERMINED && val == 3 && support == 3) ||
         (lastVal == P_UNDETERMINED && val == 0 && support == 2) ||
-        (lastVal == 3 && val == 0 && support == 0) ||
         (lastVal == 2 && val == 0 && support == 2) ||
         (lastVal == 0 && val == 3 && support == 3) || 
         (lastVal == 0 && val == 3 && support == 1) || 
@@ -223,4 +224,29 @@ void restoreValuesFromEEPROM(void) {
     input = 0;
   }
   selectInput(input);
+}
+
+void setupErrorDetection(void) {
+  detachInterrupt(PIN_ERROR);
+  pinMode(PIN_ERROR, INPUT_PULLUP);
+  attachInterrupt(PIN_ERROR, errorInt, FALLING);
+  if(digitalRead(PIN_ERROR) == LOW) {
+    errorInt();
+  }
+}
+
+void errorInt(void) {
+  detachInterrupt(PIN_ERROR);
+
+  unsigned long endTime = millis() + ERROR_TIME; 
+  while (digitalRead(PIN_ERROR) == LOW) { 
+    if (millis() >= endTime) { 
+      speakers(false);
+      softPower(false);
+      drawError();
+      break;
+    }
+  }
+
+  attachInterrupt(digitalPinToInterrupt(PIN_ERROR), errorInt, FALLING); 
 }

@@ -13,6 +13,9 @@ void drawLoadingSequence(int amount);
 void showKernelAcousticLogo(void);
 void drawSmallKernelAcousticLogo(void);
 void drawMute(bool state);
+void drawError(void);
+void clearError(void);
+bool isErrorActive(void);
 
 extern unsigned int loadingGradient[];
 

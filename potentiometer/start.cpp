@@ -50,7 +50,7 @@ void initialization(void) {
 
   initBasicPIO();
   initPeripherials();
-  rc5 = initRC5(RC5PIN);
+  rc5 = initRC5(PIN_RC5);
   rc5->setDefaultCallback();
 
   #ifdef I2C_SCANNER
@@ -132,6 +132,7 @@ void looper(void) {
         looperSequence();
       }
       muteSequence(!isMuteON());
+      drawMute(isMuteON());
     }
     if(command == RC5_MUTE) {
       muteSequence(!isMuteON());
@@ -194,6 +195,7 @@ void powerSequence(bool state) {
     softInitDisplay();
     launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
     launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
+    clearError();
 #ifdef SKIP_INTRO
     lastStepLoading(NULL);
 #else
@@ -242,12 +244,12 @@ bool volumeSave(void *v) {
 }
 
 bool enableSpeakers(void *v) {
-  speakers(true);
+  speakers(!isErrorActive());
   return false;
 }
 
 bool enableSoftPower(void *v) {
-  softPower(true);
+  softPower(!isErrorActive());
   return false;
 }
 

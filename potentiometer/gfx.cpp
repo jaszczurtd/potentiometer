@@ -14,6 +14,9 @@ static bool redrawMute = false;
 static bool muteState = false;
 static bool muteDrawn = false;
 
+static bool redrawError = false;
+static bool errorDrawn = false;
+
 static unsigned long muteTime = 0;
 
 unsigned int loadingGradient[LOADING_STEPS];
@@ -94,6 +97,20 @@ void drawMute(bool state) {
   muteTime = millis() + (SECOND * MUTE_TIME_DISPLAY);
 }
 
+void clearError(void) {
+  redrawError = errorDrawn = false;
+  setupErrorDetection();
+}
+
+void drawError(void) {
+  redrawError = true;
+  errorDrawn = false;
+}
+
+bool isErrorActive(void) {
+  return redrawError;
+}
+
 void drawLineSection(int x, int y, int sections, uint16_t color) {
   TFT *tft = returnTFTReference();
 
@@ -158,7 +175,20 @@ bool displayValues(void *v) {
 
       muteDrawn = true;
     }
+    return true;
+  }
 
+  if(redrawError) {
+    if(!errorDrawn) {
+      clearScreen();
+
+      x = (SCREEN_W - ERROR_WIDTH) / 2;
+      y = (SCREEN_H - ERROR_HEIGHT) / 2;
+
+      tft->drawImage(x, y, ERROR_WIDTH, ERROR_HEIGHT, ICONS_BG_COLOR,
+                    (unsigned short*)error_g);
+      errorDrawn = true;
+    }
     return true;
   }
 

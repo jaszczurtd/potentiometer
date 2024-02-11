@@ -13,6 +13,9 @@
 #define UNSYNCHRONIZE_TIME 15
 #define CORE_OPERATION_DELAY 1
 
+//miloseconds: time to show error 
+#define ERROR_TIME 800
+
 #define SECOND 1000
 
 //in seconds
