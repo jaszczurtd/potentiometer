@@ -13,6 +13,9 @@
 #include <Arduino.h>
 #include "tools.h"
 
+//in ms
+#define RC5_PROBE_TIME 150
+
 #define RC5_NONE 0
 #define RC5_POWER 12
 #define RC5_VOLUME_UP 16

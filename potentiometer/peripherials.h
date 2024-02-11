@@ -10,6 +10,9 @@
 
 extern unsigned char values[];
 
+#define UNSYNCHRONIZE_TIME 15
+#define CORE_OPERATION_DELAY 1
+
 #define MAX_VOLUME 42
 #define INPUT_SELECTOR_START_BIT 2 
 
