@@ -13,5 +13,5 @@ install Adafruit GFX_Library
 install arduino-timer (by Michael Contreras)
 
 ### How does it work?
-https://www.youtube.com/watch?v=pf1WLKDD8ds
+https://youtu.be/oaPJxIGpuWQ
 
