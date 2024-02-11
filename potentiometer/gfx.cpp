@@ -7,8 +7,8 @@ static bool redrawInpt = true;
 static bool redrawInptNumber = true;
 static bool redrawVolBar = true;
 
-static int lastL = -1;
-static int lastR = -1;
+static int lastL = P_UNDETERMINED;
+static int lastR = P_UNDETERMINED;
 
 static bool redrawMute = false;
 static bool muteState = false;
@@ -25,10 +25,10 @@ void drawSmallKernelAcousticLogo(void) {
   int x, y;
   TFT *tft = returnTFTReference();
 
-  x = (SCREEN_W - WSTEP_KERNEL_ACOUSTIC_WIDTH) / 2;
-  y = (SCREEN_H - WSTEP_KERNEL_ACOUSTIC_HEIGHT) / 2;
-  tft->fillRect(x, y, WSTEP_KERNEL_ACOUSTIC_WIDTH,
-                WSTEP_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR);
+  x = (SCREEN_W - INTRO_KERNEL_ACOUSTIC_WIDTH) / 2;
+  y = (SCREEN_H - INTRO_KERNEL_ACOUSTIC_HEIGHT) / 2;
+  tft->fillRect(x, y, INTRO_KERNEL_ACOUSTIC_WIDTH,
+                INTRO_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR);
 
   x = (SCREEN_W - LOAD_KERNEL_ACOUSTIC_WIDTH) / 2;
   y = ((SCREEN_H - LOAD_KERNEL_ACOUSTIC_HEIGHT) / 2) / 1.3;
@@ -40,11 +40,11 @@ void drawSmallKernelAcousticLogo(void) {
 void showKernelAcousticLogo(void) {
   TFT *tft = returnTFTReference();
   clearScreen();
-  const int x = (SCREEN_W - WSTEP_KERNEL_ACOUSTIC_WIDTH) / 2;
-  const int y = (SCREEN_H - WSTEP_KERNEL_ACOUSTIC_HEIGHT) / 2;
-  tft->drawImage(x, y, WSTEP_KERNEL_ACOUSTIC_WIDTH,
-                  WSTEP_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR,
-                  (unsigned short*)wstep_kernel_acoustic);
+  const int x = (SCREEN_W - INTRO_KERNEL_ACOUSTIC_WIDTH) / 2;
+  const int y = (SCREEN_H - INTRO_KERNEL_ACOUSTIC_HEIGHT) / 2;
+  tft->drawImage(x, y, INTRO_KERNEL_ACOUSTIC_WIDTH,
+                  INTRO_KERNEL_ACOUSTIC_HEIGHT, ICONS_BG_COLOR,
+                  (unsigned short*)intro_kernel_acoustic);
 }
 
 void drawLoadingSequence(int amount) {
@@ -72,7 +72,7 @@ void drawLoadingSequence(int amount) {
 
 void redrawScreen(void) {
   clearScreen();
-  lastR = lastL = -1;
+  lastR = lastL = P_UNDETERMINED;
   redrawVol = true;
   redrawVolNumber = true;
   redrawInpt = true;

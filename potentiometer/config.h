@@ -4,9 +4,9 @@
 //#define I2C_SCANNER
 
 //those defined only for debug
-#define SKIP_INTRO
-#define SKIP_OFF
-#define SKIP_OFF_SECONDS_TO_START 2
+//#define SKIP_INTRO
+//#define SKIP_OFF
+//#define SKIP_OFF_SECONDS_TO_START 2
 
 #define SECOND 1000
 
