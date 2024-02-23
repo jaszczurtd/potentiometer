@@ -11,6 +11,8 @@ static unsigned char inputsTab[] = {
 };
 
 void initPeripherials(void) {
+  analogWriteResolution(ANALOG_WRITE_RESOLUTION);
+
   pinMode(PIN_POWER_IN, INPUT_PULLUP);
   pinMode(PIN_POWER_OUT, OUTPUT);
 
@@ -21,10 +23,17 @@ void initPeripherials(void) {
     pinMode(inputsTab[a], INPUT_PULLUP);
   }
 
-  encInit();
+  pinMode(PIN_INPUTS_AMOUNT, INPUT_PULLUP);
 
   pinMode(PIN_SPEAKERS, OUTPUT);
   pinMode(PIN_SOFTPOWER, OUTPUT);
+
+  encInit();
+  lcdBrightness(0);
+}
+
+void lcdBrightness(int val) {
+  analogWrite(PIN_LCD_BRIGHTNESS, ((1 << ANALOG_WRITE_RESOLUTION) - 1) - val);
 }
 
 void power(bool state) {
@@ -73,7 +82,7 @@ void encInit(void) {
 }
 
 void encoderSupport(void) {
-  if(isPowerON()) {
+  if(isPowerON() && isSystemLoaded()) {
     delayMicroseconds(ENC_DEBOUNCE);
     support = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
   }
@@ -100,7 +109,7 @@ void volumeDown(void) {
 }
 
 void encoder(void) {
-  if(isPowerON()) {
+  if(isPowerON() && isSystemLoaded()) {
     delayMicroseconds(ENC_DEBOUNCE);
     int val = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
     if(val != lastVal) {
@@ -186,6 +195,19 @@ int translateRC5ToInputState(int command) {
   }
 
   return selectedInput;
+}
+
+int limitInputs(int input) {
+  if(!digitalRead(PIN_INPUTS_AMOUNT)) {
+    int a = LIMITED_INPUTS;
+    if(a > 8 - INPUT_SELECTOR_START_BIT) {
+      a = 8 - INPUT_SELECTOR_START_BIT;
+    }
+    if(input > a) {
+      input = -1;
+    }
+  }
+  return input;
 }
 
 void selectInput(int input) {

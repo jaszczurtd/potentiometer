@@ -132,11 +132,15 @@ void looper(void) {
         looperSequence();
       }
       muteSequence(!isMuteON());
-      drawMute(isMuteON());
+      if(isSystemLoaded()) {
+        drawMute(isMuteON());
+      }
     }
     if(command == RC5_MUTE) {
       muteSequence(!isMuteON());
-      drawMute(isMuteON());
+      if(isSystemLoaded()) {
+        drawMute(isMuteON());
+      }
     }
 
     if(!values[V_MUTE]) {
@@ -193,6 +197,7 @@ void powerSequence(bool state) {
 
   if(state) {
     softInitDisplay();
+    lcdBrightness(30);
     launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
     launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
     clearError();
@@ -203,6 +208,7 @@ void powerSequence(bool state) {
     showKernelAcousticLogo();
 #endif
   } else {
+    lcdBrightness(0);
     cancelTimerTasks();
     clearScreen();
     speakers(false);
@@ -214,16 +220,26 @@ void powerSequence(bool state) {
 }
 
 void muteSequence(bool state) {
-  values[V_MUTE] = state;
-  mute(values[V_MUTE]);
-  storeValuesToEEPROM();
+  if(isSystemLoaded()) {
+    values[V_MUTE] = state;
+    mute(values[V_MUTE]);
+    storeValuesToEEPROM();
+  }
 }
 
 void inputSequence(int input) {
-  selectInput(input);
-  values[V_SELECTED_INPUT] = input;
-  storeValuesToEEPROM();
-  redrawInput();
+  if(isSystemLoaded()) {
+    input = limitInputs(input);
+    if(input < 0) {
+      return;
+    }
+    if(values[V_SELECTED_INPUT] != input) {
+      values[V_SELECTED_INPUT] = input;
+      selectInput(input);
+      storeValuesToEEPROM();
+      redrawInput();
+    }
+  }
 }
 
 bool enableOn(void *v) {

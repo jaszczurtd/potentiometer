@@ -55,4 +55,7 @@
 
 #define PIN_ERROR 8
 
+#define PIN_INPUTS_AMOUNT 26
+#define PIN_LCD_BRIGHTNESS 22
+
 #endif

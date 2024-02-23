@@ -10,6 +10,8 @@
 
 extern unsigned char values[];
 
+#define ANALOG_WRITE_RESOLUTION 8
+
 #define UNSYNCHRONIZE_TIME 15
 #define CORE_OPERATION_DELAY 1
 
@@ -26,6 +28,7 @@ extern unsigned char values[];
 #define MAX_VALUES 3
 
 void initPeripherials(void);
+void lcdBrightness(int val);
 void power(bool state);
 bool isPowerON(void);
 bool isPowerPressed(void);
@@ -40,6 +43,7 @@ void muteWithEncoderSupport(void);
 void setVol(int value);
 int readInputsKeyboardState(void);
 int translateRC5ToInputState(int command);
+int limitInputs(int input);
 void selectInput(int input);
 void storeValuesToEEPROM(void);
 void restoreValuesFromEEPROM(void);

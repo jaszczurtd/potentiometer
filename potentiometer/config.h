@@ -22,12 +22,16 @@
 #define TIME_INTRO_TIME_KERNEL_ACOUSTIC 2
 #define TIME_LOAD 30
 #define MUTE_TIME_DISPLAY 2
+#define SCREEN_DIMMER 10
 
 #define LOADING_STEPS 42
 //loading bar steps optimizaion
 #define AMOUNT_BARS_UNTIL_LOGO 15 
 
 #define TIME_DELAY_VOLUME_RC5_CONTROL 200
+
+//0 to 5
+#define LIMITED_INPUTS 3
 
 #endif
 
