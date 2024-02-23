@@ -22,7 +22,7 @@
 #define TIME_INTRO_TIME_KERNEL_ACOUSTIC 2
 #define TIME_LOAD 30
 #define MUTE_TIME_DISPLAY 2
-#define SCREEN_DIMMER 10
+#define SCREEN_DIMMER 8
 
 #define LOADING_STEPS 42
 //loading bar steps optimizaion
@@ -33,5 +33,11 @@
 //0 to 5
 #define LIMITED_INPUTS 3
 
+//0 to 255
+#define BRIGHTNESS_MAX 255
+#define BRIGHTNESS_AMBIENT 26
+
+//ms
+#define BRIGHTNESS_FADER_STEP_TIME 15
 #endif
 

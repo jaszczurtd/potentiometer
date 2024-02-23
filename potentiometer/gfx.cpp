@@ -78,15 +78,18 @@ void redrawScreen(void) {
   redrawInpt = true;
   redrawInptNumber = true;
   redrawVolBar = true;
+  launchDimmer();
 }
 
 void redrawVolume(void) {
   redrawVolNumber = true;
   redrawVolBar = true;
+  launchDimmer();
 }
 
 void redrawInput(void) {
   redrawInptNumber = true;
+  launchDimmer();
 }
 
 void drawMute(bool state) {
@@ -95,6 +98,7 @@ void drawMute(bool state) {
   clearScreen();
   muteDrawn = false;
   muteTime = millis() + (SECOND * MUTE_TIME_DISPLAY);
+  launchDimmer();
 }
 
 void clearError(void) {
@@ -105,6 +109,7 @@ void clearError(void) {
 void drawError(void) {
   redrawError = true;
   errorDrawn = false;
+  cancelDimmerTask();
 }
 
 bool isErrorActive(void) {

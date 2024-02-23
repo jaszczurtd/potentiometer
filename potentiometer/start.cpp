@@ -85,6 +85,28 @@ void looperSequence(void) {
   delay(CORE_OPERATION_DELAY);  
 }
 
+static int dimmerValue;
+bool fadeDimmer(void *v) {
+
+  lcdBrightness(dimmerValue);
+  if(dimmerValue == BRIGHTNESS_AMBIENT) {
+    return false;
+  }
+  dimmerValue--;
+  return true;
+}
+
+bool mainScreenDimmer(void *v) {
+  dimmerValue = BRIGHTNESS_MAX;
+  setupDimmerSequence(BRIGHTNESS_FADER_STEP_TIME, fadeDimmer);
+  return false;
+}
+
+void launchDimmer(void) {
+  lcdBrightness(BRIGHTNESS_MAX);
+  launchDimmerAt(SCREEN_DIMMER * SECOND, mainScreenDimmer);
+}
+
 void looper(void) {
 
   bool received = false;
@@ -197,7 +219,7 @@ void powerSequence(bool state) {
 
   if(state) {
     softInitDisplay();
-    lcdBrightness(30);
+    lcdBrightness(BRIGHTNESS_MAX);
     launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
     launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
     clearError();

@@ -2,6 +2,7 @@
 #include "tools.h"
 
 static Timer generalTimer;
+static Timer dimmerTimer;
 
 NOINIT static char deb_buffer[MAX_DEB_BUFFER];
 void deb(const char *format, ...) {
@@ -62,23 +63,39 @@ void initSPI(void) {
 
 void createTimerObject(void) {
   generalTimer = timer_create_default();
+  dimmerTimer = timer_create_default();
 }
 
 void timerTick(void) {
   generalTimer.tick();
+  dimmerTimer.tick();
 }
 
 void setupTimerWith(unsigned long ut, unsigned long time, bool(*function)(void *argument)) {
   generalTimer.every(time, function);
-  delay(CORE_OPERATION_DELAY);
+  delay(ut);
 }
 
 void launchTaskAt(unsigned long time, bool(*function)(void *argument)) {
   generalTimer.in(time, function);  
 }
 
+void launchDimmerAt(unsigned long time, bool(*function)(void *argument)) {
+  cancelDimmerTask();
+  dimmerTimer.in(time, function);
+}
+
+void setupDimmerSequence(unsigned long time, bool(*function)(void *argument)) {
+  dimmerTimer.every(time, function);
+}
+
+void cancelDimmerTask(void) {
+  dimmerTimer.cancel();
+}
+
 void cancelTimerTasks(void) {
   generalTimer.cancel();
+  cancelDimmerTask();
 }
 
 static int pcf_addrs[] = {
