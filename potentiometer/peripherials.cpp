@@ -10,9 +10,12 @@ static unsigned char inputsTab[] = {
   PIN_INPUT_6, PIN_INPUT_5, PIN_INPUT_4, PIN_INPUT_3, PIN_INPUT_1, PIN_INPUT_2
 };
 
-void initPeripherials(void) {
+void initMainPIO(void) {
   analogWriteResolution(ANALOG_WRITE_RESOLUTION);
+  lcdBrightness(0);
+}
 
+void initPeripherials(void) {
   pinMode(PIN_POWER_IN, INPUT_PULLUP);
   pinMode(PIN_POWER_OUT, OUTPUT);
 
@@ -29,7 +32,6 @@ void initPeripherials(void) {
   pinMode(PIN_SOFTPOWER, OUTPUT);
 
   encInit();
-  lcdBrightness(0);
 }
 
 void lcdBrightness(int val) {

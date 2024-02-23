@@ -27,6 +27,7 @@ extern unsigned char values[];
 #define V_SELECTED_INPUT 2
 #define MAX_VALUES 3
 
+void initMainPIO(void);
 void initPeripherials(void);
 void lcdBrightness(int val);
 void power(bool state);

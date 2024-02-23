@@ -35,20 +35,23 @@ void initialization(void) {
 
   Serial.begin(9600);
  
+  initMainPIO();
+  initBasicPIO();
+
+  initSPI();
   TFT *tft = initTFT();
+  tft->fillScreen(ICONS_BG_COLOR);
 
   initI2C();
   pcf8574_init();
   Wire.end();
 
-  initSPI();
   initI2C();
 
   #ifdef RESET_EEPROM
   resetEEPROM();
   #endif
 
-  initBasicPIO();
   initPeripherials();
   rc5 = initRC5(PIN_RC5);
   rc5->setDefaultCallback();
@@ -56,8 +59,6 @@ void initialization(void) {
   #ifdef I2C_SCANNER
   i2cScanner();
   #endif
-
-  tft->fillScreen(ICONS_BG_COLOR);
 
   generateGradient(loadingGradient, LOADING_COLOR_1, LOADING_COLOR_2, LOADING_STEPS);
   setupTimers();

@@ -52,22 +52,16 @@ void drawLoadingSequence(int amount) {
   int a = 0;
   TFT *tft = returnTFTReference();
 
-  if(amount >= AMOUNT_BARS_UNTIL_LOGO) {
-    a = amount - 1;
-  }
-
   y = LOADING_BAR_Y;
-  for(; a < amount; a++) {
+  for(a = 0; a < amount; a++) {
     x = LOADING_BAR_X + (a * LOADING_BAR_X_OFFSET);
     tft->drawLine(x, y, x, y + LOADING_BAR_HEIGHT, loadingGradient[a]);
   }
 
-  if(amount <= AMOUNT_BARS_UNTIL_LOGO) {
-    x = LOADING_X;
-    y = LOADING_Y;
-    tft->drawRGBBitmapTransparent(x, y, (unsigned short*)loading,
-                                  LOADING_WIDTH, LOADING_HEIGHT, ICONS_BG_COLOR);
-  }
+  x = LOADING_X;
+  y = LOADING_Y;
+  tft->drawRGBBitmapTransparent(x, y, (unsigned short*)loading,
+                                LOADING_WIDTH, LOADING_HEIGHT, ICONS_BG_COLOR);
 }
 
 void redrawScreen(void) {
