@@ -89,12 +89,17 @@ void looperSequence(void) {
 static int dimmerValue;
 bool fadeDimmer(void *v) {
 
-  lcdBrightness(dimmerValue);
-  if(dimmerValue == BRIGHTNESS_AMBIENT) {
+  if(!isErrorActive()) {
+    lcdBrightness(dimmerValue);
+    if(dimmerValue == BRIGHTNESS_AMBIENT) {
+      return false;
+    }
+    dimmerValue--;
+    return true;
+  } else {
+    lcdBrightness(BRIGHTNESS_MAX);
     return false;
   }
-  dimmerValue--;
-  return true;
 }
 
 bool mainScreenDimmer(void *v) {
@@ -105,7 +110,11 @@ bool mainScreenDimmer(void *v) {
 
 void launchDimmer(void) {
   lcdBrightness(BRIGHTNESS_MAX);
-  launchDimmerAt(SCREEN_DIMMER * SECOND, mainScreenDimmer);
+  if(!isErrorActive()) {
+    launchDimmerAt(SCREEN_DIMMER * SECOND, mainScreenDimmer);
+  } else {
+    cancelDimmerTask();
+  }
 }
 
 void looper(void) {
@@ -214,14 +223,18 @@ void powerSequence(bool state) {
   if(state) {
     softInitDisplay();
     lcdBrightness(BRIGHTNESS_MAX);
-    launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
-    launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
     clearError();
-#ifdef SKIP_INTRO
-    lastStepLoading(NULL);
-#else
-    launchTaskAt(TIME_INTRO_TIME_KERNEL_ACOUSTIC * SECOND, enableLoading);
-    showKernelAcousticLogo();
+    if(!setupErrorDetection()) {
+      launchTaskAt(TIME_DELAY_SPEAKERS * SECOND, enableSpeakers);
+      launchTaskAt(TIME_DELAY_SOFT_POWER * SECOND, enableSoftPower);
+  #ifdef SKIP_INTRO
+      lastStepLoading(NULL);
+  #else
+      launchTaskAt(TIME_INTRO_TIME_KERNEL_ACOUSTIC * SECOND, enableLoading);
+      showKernelAcousticLogo();
+    } else {
+      isLoaded = true;      
+    }
 #endif
   } else {
     lcdBrightness(0);
@@ -259,6 +272,9 @@ void inputSequence(int input) {
 }
 
 void increaseInput(void) {
+  if(isErrorActive()) {
+    return;
+  }
   int input = values[V_SELECTED_INPUT];
   input++;
   if(input > getAmountOfHardwareInputs() - 1) {
@@ -299,6 +315,11 @@ bool enableSoftPower(void *v) {
 }
 
 bool enableLoading(void *v) {
+  if(isErrorActive()) {
+    isLoaded = true;
+    return false;
+  }
+
   drawSmallKernelAcousticLogo();
   drawLoadingSequence(loadingCounter++);
   setupTimerWith(UNSYNCHRONIZE_TIME, int(float(float(TIME_LOAD) / float(LOADING_STEPS)) * SECOND),
@@ -307,6 +328,10 @@ bool enableLoading(void *v) {
 }
 
 bool loadingProgress(void *v) {
+  if(isErrorActive()) {
+    isLoaded = true;
+    return false;
+  }
   drawLoadingSequence(loadingCounter++);
   if(loadingCounter > LOADING_STEPS) {
     launchTaskAt(TIME_INTRO_TIME_KERNEL_ACOUSTIC * SECOND, lastStepLoading);

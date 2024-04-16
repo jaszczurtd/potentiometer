@@ -162,6 +162,10 @@ void muteWithEncoderSupport(void) {
 
 void setVol(int value) {
 
+  if(isErrorActive()) {
+    return;
+  }
+
   if (value >= 0 && value < MAX_VOLUME) {
     int bit = value % 8;
     int expanderIndex = value / 8;
@@ -254,12 +258,23 @@ void restoreValuesFromEEPROM(void) {
   selectInput(input);
 }
 
-void setupErrorDetection(void) {
+bool setupErrorDetection(void) {
   detachInterrupt(PIN_ERROR);
   pinMode(PIN_ERROR, INPUT_PULLUP);
   attachInterrupt(PIN_ERROR, errorInt, FALLING);
   if(digitalRead(PIN_ERROR) == LOW) {
     errorInt();
+    return true;
+  }
+  return false;
+}
+
+void errorLoopHandle(void) {
+  if(isErrorActive()) {
+    if(digitalRead(PIN_ERROR) == HIGH) {
+      clearError();
+      redrawScreen();
+    }
   }
 }
 

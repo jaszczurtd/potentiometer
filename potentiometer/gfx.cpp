@@ -97,13 +97,13 @@ void drawMute(bool state) {
 
 void clearError(void) {
   redrawError = errorDrawn = false;
-  setupErrorDetection();
 }
 
 void drawError(void) {
   redrawError = true;
   errorDrawn = false;
   cancelDimmerTask();
+  lcdBrightness(BRIGHTNESS_MAX);
 }
 
 bool isErrorActive(void) {

@@ -49,7 +49,8 @@ int limitInputs(int input);
 void selectInput(int input);
 void storeValuesToEEPROM(void);
 void restoreValuesFromEEPROM(void);
-void setupErrorDetection(void);
+bool setupErrorDetection(void);
+void errorLoopHandle(void);
 
 #endif
 
