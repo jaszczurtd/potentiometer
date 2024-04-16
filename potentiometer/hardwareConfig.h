@@ -35,7 +35,7 @@
 
 #define PIN_POWER_IN 21
 #define PIN_POWER_OUT 2
-#define PIN_MUTE_IN 6
+#define PIN_ADD_POWER_IN 6
 #define PIN_MUTE_OUT 14
 
 #define PIN_SPEAKERS 3

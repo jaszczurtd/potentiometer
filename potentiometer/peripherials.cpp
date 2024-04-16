@@ -10,6 +10,10 @@ static unsigned char inputsTab[] = {
   PIN_INPUT_6, PIN_INPUT_5, PIN_INPUT_4, PIN_INPUT_3, PIN_INPUT_1, PIN_INPUT_2
 };
 
+int getAmountOfHardwareInputs(void) {
+  return sizeof(inputsTab);
+} 
+
 void initMainPIO(void) {
   analogWriteResolution(ANALOG_WRITE_RESOLUTION);
   lcdBrightness(0);
@@ -19,7 +23,7 @@ void initPeripherials(void) {
   pinMode(PIN_POWER_IN, INPUT_PULLUP);
   pinMode(PIN_POWER_OUT, OUTPUT);
 
-  pinMode(PIN_MUTE_IN, INPUT_PULLUP);
+  pinMode(PIN_ADD_POWER_IN, INPUT_PULLUP);
   pinMode(PIN_MUTE_OUT, OUTPUT);
 
   for(int a = 0; a < (int)sizeof(inputsTab); a++) {
@@ -50,16 +54,16 @@ bool isPowerPressed(void) {
   return !digitalRead(PIN_POWER_IN);
 }
 
+bool isAdditionalPowerPresed(void) {
+  return !digitalRead(PIN_ADD_POWER_IN);
+}
+
 void mute(bool state) {
   digitalWrite(PIN_MUTE_OUT, state);
 }
 
 bool isMuteON(void) {
   return digitalRead(PIN_MUTE_OUT);
-}
-
-bool isMutePressed(void) {
-  return !digitalRead(PIN_MUTE_IN);
 }
 
 void speakers(bool state) {
@@ -244,7 +248,7 @@ void restoreValuesFromEEPROM(void) {
   mute(values[V_MUTE]);
 
   int input = values[V_SELECTED_INPUT];
-  if(input > (int)sizeof(inputsTab) - 1) {
+  if(input > getAmountOfHardwareInputs() - 1) {
     input = 0;
   }
   selectInput(input);
@@ -274,3 +278,4 @@ void errorInt(void) {
 
   attachInterrupt(digitalPinToInterrupt(PIN_ERROR), errorInt, FALLING); 
 }
+

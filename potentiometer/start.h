@@ -30,10 +30,13 @@ bool callAtEveryHalfHalfSecond(void *argument);
 
 void initialization(void);
 void initialization1(void);
+void looperSequence(void);
 void looper(void);
 void looper1(void);
 bool seriousAlertSwitch(void);
 bool alertSwitch(void);
 void launchDimmer(void);
+void additionalPowerHandle(void);
+void increaseInput(void);
 
 #endif

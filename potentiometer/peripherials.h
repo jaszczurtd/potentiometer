@@ -27,19 +27,20 @@ extern unsigned char values[];
 #define V_SELECTED_INPUT 2
 #define MAX_VALUES 3
 
+int getAmountOfHardwareInputs(void);
 void initMainPIO(void);
 void initPeripherials(void);
 void lcdBrightness(int val);
 void power(bool state);
 bool isPowerON(void);
 bool isPowerPressed(void);
+bool isAdditionalPowerPresed(void);
 void mute(bool state);
 void volumeUp(void);
 void volumeDown(void);
 void speakers(bool state);
 void softPower(bool state);
 bool isMuteON(void);
-bool isMutePressed(void);
 void muteWithEncoderSupport(void);
 void setVol(int value);
 int readInputsKeyboardState(void);

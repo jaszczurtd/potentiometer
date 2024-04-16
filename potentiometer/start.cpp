@@ -139,6 +139,8 @@ void looper(void) {
     looperSequence();
   }
 
+  additionalPowerHandle();
+
   if(isPowerPressed()) {
     while(isPowerPressed()) {
       looperSequence();
@@ -150,15 +152,6 @@ void looper(void) {
   }
 
   if(isPowerON()) {
-    if(isMutePressed()) {
-      while(isMutePressed()) {
-        looperSequence();
-      }
-      muteSequence(!isMuteON());
-      if(isSystemLoaded()) {
-        drawMute(isMuteON());
-      }
-    }
     if(command == RC5_MUTE) {
       muteSequence(!isMuteON());
       if(isSystemLoaded()) {
@@ -265,6 +258,19 @@ void inputSequence(int input) {
   }
 }
 
+void increaseInput(void) {
+  int input = values[V_SELECTED_INPUT];
+  input++;
+  if(input > getAmountOfHardwareInputs() - 1) {
+    input = 0;
+  }
+  input = limitInputs(input);
+  if(input < 0) {
+    input = 0;
+  }
+  inputSequence(input);
+}
+
 bool enableOn(void *v) {
   powerSequence(true);
   return false;
@@ -321,3 +327,30 @@ bool lastStepLoading(void *v) {
   return false;
 }
 
+void additionalPowerHandle(void) {
+
+  if(!isPowerON()) {
+    if(isAdditionalPowerPresed()) {
+      while(isAdditionalPowerPresed()) {
+        looperSequence();
+      }
+      powerSequence(!isPowerON());
+    }
+  } else {
+    if(isAdditionalPowerPresed()) {
+      unsigned long timeStart = millis() + (TIME_ENCODER_PRESS_TO_OFF * SECOND);
+      while(isAdditionalPowerPresed()) {
+        looperSequence();
+        if(millis() > timeStart) {
+          powerSequence(!isPowerON());
+          while(isAdditionalPowerPresed()) {
+            looperSequence();
+          }
+          return;
+        }
+      }
+      increaseInput(); 
+    }
+  }
+
+}
