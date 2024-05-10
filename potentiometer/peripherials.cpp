@@ -1,4 +1,3 @@
-
 #include "peripherials.h"
 
 void encoder(void);
@@ -87,36 +86,34 @@ void encInit(void) {
   currentEncoderMillis = millis();
 }
 
-void encoderSupport(void) {
-  if(isPowerON() && isSystemLoaded()) {
-    delayMicroseconds(ENC_DEBOUNCE);
-    support = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
-  }
-}
-
 void volumeUp(void) {
   if(values[V_VOLUME] < MAX_VOLUME) {
-    if(!values[V_MUTE]) {
-      mute(true);
-    }
     values[V_VOLUME]++;
+    if(isMuteON()) {
+      muteSequence(false);
+    }
     redrawVolume();
   }
 }
 
 void volumeDown(void) {
   if(values[V_VOLUME] > 0) {
-    if(!values[V_MUTE]) {
-      mute(true);
-    }
     values[V_VOLUME]--;
+    if(isMuteON()) {
+      muteSequence(false);
+    }
     redrawVolume();
   }      
 }
 
+void encoderSupport(void) {
+  if(isPowerON() && isSystemLoaded()) {
+    support = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
+  }
+}
+
 void encoder(void) {
   if(isPowerON() && isSystemLoaded()) {
-    delayMicroseconds(ENC_DEBOUNCE);
     int val = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
     if(val != lastVal) {
       if(!values[V_MUTE]) {
@@ -145,17 +142,7 @@ void encoder(void) {
         volumeDown();
       }
 
-      deb("%d %d %d", lastVal, val, support);
-
       lastVal = val;
-    }
-  }
-}
-
-void muteWithEncoderSupport(void) {
-  if(isPowerON()) {
-    if (currentEncoderMillis - previousEncoderMillis >= MUTE_FOR_CHANGE_VOLUME) {
-      mute(false);
     }
   }
 }
@@ -167,19 +154,25 @@ void setVol(int value) {
   }
 
   if (value >= 0 && value < MAX_VOLUME) {
+  
     int bit = value % 8;
     int expanderIndex = value / 8;
+
+    pcf8574_write(expanderIndex, bit, false);
+
+    delay(TIME_VOLUME_MBB);
 
     for (int i = 0; i < PCF8574_AMOUNT; i++) {
       for (int j = 0; j < 8; j++) {
         if(i == PCF_INPUTS && j > INPUT_SELECTOR_START_BIT - 1) {
           break;
         }
-        pcf8574_write(i, j, true);
+        if(j != bit) {
+          pcf8574_write(i, j, true);
+        }
       }
     }
 
-    pcf8574_write(expanderIndex, bit, false);
   }
 }
 
@@ -231,12 +224,15 @@ void selectInput(int input) {
 }
 
 void storeValuesToEEPROM(void) {
+#ifdef EEPROM_SUPPORTED
   for(int a = 0; a < MAX_VALUES; a++) {
     writeAT24(a, values[a]);
   }
+#endif
 }
 
 void restoreValuesFromEEPROM(void) {
+#ifdef EEPROM_SUPPORTED
   for(int a = 0; a < MAX_VALUES; a++) {
     values[a] = readAT24(a);
   }
@@ -256,6 +252,7 @@ void restoreValuesFromEEPROM(void) {
     input = 0;
   }
   selectInput(input);
+#endif
 }
 
 bool setupErrorDetection(void) {

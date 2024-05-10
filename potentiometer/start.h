@@ -38,5 +38,6 @@ bool alertSwitch(void);
 void launchDimmer(void);
 void additionalPowerHandle(void);
 void increaseInput(void);
+void muteSequence(bool state);
 
 #endif
