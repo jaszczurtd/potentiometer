@@ -245,6 +245,7 @@ void powerSequence(bool state) {
     softPower(false);
     mute(false);
     cancelTimerTasks();
+    pcf8574_init();
     drawBye();
     launchTaskAt(TIME_DELAY_BYE * SECOND, goOff);
   }
@@ -253,7 +254,6 @@ void powerSequence(bool state) {
 bool goOff(void *v) {
   lcdBrightness(0);
   clearScreen();
-  pcf8574_init();
   isOnPowerOffState = false;
   setupTimers();
   callAtEverySecond(NULL);
