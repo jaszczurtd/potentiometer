@@ -97,6 +97,9 @@ void encoderSupport(void) {
 void volumeUp(void) {
   if(values[V_VOLUME] < MAX_VOLUME) {
     values[V_VOLUME]++;
+    if(isMuteON()) {
+      muteSequence(false);
+    }
     redrawVolume();
   }
 }
@@ -104,6 +107,9 @@ void volumeUp(void) {
 void volumeDown(void) {
   if(values[V_VOLUME] > 0) {
     values[V_VOLUME]--;
+    if(isMuteON()) {
+      muteSequence(false);
+    }
     redrawVolume();
   }      
 }
