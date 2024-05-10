@@ -1,4 +1,3 @@
-
 #include "peripherials.h"
 
 void encoder(void);
@@ -87,13 +86,6 @@ void encInit(void) {
   currentEncoderMillis = millis();
 }
 
-void encoderSupport(void) {
-  if(isPowerON() && isSystemLoaded()) {
-    delayMicroseconds(ENC_DEBOUNCE);
-    support = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
-  }
-}
-
 void volumeUp(void) {
   if(values[V_VOLUME] < MAX_VOLUME) {
     values[V_VOLUME]++;
@@ -114,9 +106,14 @@ void volumeDown(void) {
   }      
 }
 
+void encoderSupport(void) {
+  if(isPowerON() && isSystemLoaded()) {
+    support = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
+  }
+}
+
 void encoder(void) {
   if(isPowerON() && isSystemLoaded()) {
-    delayMicroseconds(ENC_DEBOUNCE);
     int val = digitalRead(PIN_ENC_L) | digitalRead(PIN_ENC_R) << 1;
     if(val != lastVal) {
       if(!values[V_MUTE]) {
@@ -145,8 +142,6 @@ void encoder(void) {
         volumeDown();
       }
 
-      deb("%d %d %d", lastVal, val, support);
-
       lastVal = val;
     }
   }
@@ -159,19 +154,25 @@ void setVol(int value) {
   }
 
   if (value >= 0 && value < MAX_VOLUME) {
+  
     int bit = value % 8;
     int expanderIndex = value / 8;
+
+    pcf8574_write(expanderIndex, bit, false);
+
+    delay(TIME_VOLUME_MBB);
 
     for (int i = 0; i < PCF8574_AMOUNT; i++) {
       for (int j = 0; j < 8; j++) {
         if(i == PCF_INPUTS && j > INPUT_SELECTOR_START_BIT - 1) {
           break;
         }
-        pcf8574_write(i, j, true);
+        if(j != bit) {
+          pcf8574_write(i, j, true);
+        }
       }
     }
 
-    pcf8574_write(expanderIndex, bit, false);
   }
 }
 
