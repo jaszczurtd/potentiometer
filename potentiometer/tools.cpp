@@ -3,6 +3,8 @@
 
 static Timer generalTimer;
 static Timer dimmerTimer;
+static bool generalTimerInitialized = false;
+static bool dimmerTimerInitialized = false;
 
 NOINIT static char deb_buffer[MAX_DEB_BUFFER];
 void deb(const char *format, ...) {
@@ -62,8 +64,14 @@ void initSPI(void) {
 }
 
 void createTimerObject(void) {
-  generalTimer = timer_create_default();
-  dimmerTimer = timer_create_default();
+  if(!generalTimerInitialized) {
+    generalTimer = timer_create_default();
+    generalTimerInitialized = true;
+  }
+  if(!dimmerTimerInitialized) {
+    dimmerTimer = timer_create_default();
+    dimmerTimerInitialized = true;
+  }
 }
 
 void timerTick(void) {

@@ -283,6 +283,7 @@ void errorInt(void) {
     if (millis() >= endTime) { 
       speakers(false);
       softPower(false);
+      pcf8574_init();
       drawError();
       break;
     }

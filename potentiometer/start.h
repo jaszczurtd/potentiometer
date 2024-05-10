@@ -18,6 +18,7 @@
 extern unsigned char values[];
 
 bool isSystemLoaded(void);
+bool isPowerDownSequenceActive(void);
 void drawMediumImportanceValues(void);
 void drawHighImportanceValues(void);
 void drawLowImportanceValues(void);

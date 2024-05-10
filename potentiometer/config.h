@@ -27,6 +27,7 @@
 #define TIME_ENCODER_PRESS_TO_OFF 3
 #define TIME_MUTE_BBM 2
 #define TIME_VOLUME_MBB 30
+#define TIME_DELAY_BYE 2
 
 #define LOADING_STEPS 35
 

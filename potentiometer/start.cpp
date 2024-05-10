@@ -10,6 +10,7 @@ bool enableLoading(void *v);
 bool loadingProgress(void *v);
 bool lastStepLoading(void *v);
 bool enableOn(void *v);
+bool goOff(void *v);
 
 unsigned char values[MAX_VALUES];
 static int lastStoredVolume = P_UNDETERMINED;
@@ -17,9 +18,14 @@ static unsigned long volumeRC5Millis = 0;
 static RC5 *rc5 = NULL;
 static bool isLoaded = false;
 static int loadingCounter = 0;
+static bool isOnPowerOffState = false;
 
 bool isSystemLoaded(void) {
   return isLoaded;
+}
+
+bool isPowerDownSequenceActive(void) {
+  return isOnPowerOffState;
 }
 
 void setupTimers(void) {
@@ -117,6 +123,11 @@ void launchDimmer(void) {
 }
 
 void looper(void) {
+
+  if(isPowerDownSequenceActive()) {
+    looperSequence();
+    return;
+  }
 
   bool received = false;
   int c = rc5Loop(), command = RC5_NONE;
@@ -229,15 +240,24 @@ void powerSequence(bool state) {
     }
 #endif
   } else {
-    lcdBrightness(0);
-    cancelTimerTasks();
-    clearScreen();
+    isOnPowerOffState = true;
     speakers(false);
     softPower(false);
-    pcf8574_init();
     mute(false);
-    setupTimers();
+    cancelTimerTasks();
+    drawBye();
+    launchTaskAt(TIME_DELAY_BYE * SECOND, goOff);
   }
+}
+
+bool goOff(void *v) {
+  lcdBrightness(0);
+  clearScreen();
+  pcf8574_init();
+  isOnPowerOffState = false;
+  setupTimers();
+  callAtEverySecond(NULL);
+  return false;
 }
 
 void muteSequence(bool state) {
@@ -343,6 +363,7 @@ bool lastStepLoading(void *v) {
   restoreValuesFromEEPROM();
   lastStoredVolume = values[V_VOLUME];
   setVol(values[V_VOLUME]); 
+  selectInput(values[V_SELECTED_INPUT]);
 
   isLoaded = true;
   redrawScreen();

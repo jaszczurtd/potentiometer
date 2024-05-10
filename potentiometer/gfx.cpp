@@ -83,6 +83,18 @@ void redrawInput(void) {
   launchDimmer();
 }
 
+void drawBye(void) {
+  clearScreen();
+  cancelDimmerTask();
+  lcdBrightness(BRIGHTNESS_MAX);
+
+  int x = (SCREEN_W - BYE_WIDTH) / 2;
+  int y = (SCREEN_H - BYE_HEIGHT) / 2;
+
+  returnTFTReference()->drawImage(x, y, BYE_WIDTH, BYE_HEIGHT, ICONS_BG_COLOR,
+                                 (unsigned short*)bye_g);
+}
+
 void drawMute(bool state) {
   redrawMute = state;
   if(state) {
@@ -137,12 +149,17 @@ const unsigned short *vol_numbers[] = {
 
 bool displayValues(void *v) {
 
+  if(isPowerDownSequenceActive()) {
+    return true;
+  }
+
   if(!isPowerON()){
     return true;
   }
   if(!isSystemLoaded()) {
     return true;
   }
+
   TFT *tft = returnTFTReference();
   int x, y;
 
