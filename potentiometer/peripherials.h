@@ -41,7 +41,6 @@ void volumeDown(void);
 void speakers(bool state);
 void softPower(bool state);
 bool isMuteON(void);
-void muteWithEncoderSupport(void);
 void setVol(int value);
 int readInputsKeyboardState(void);
 int translateRC5ToInputState(int command);

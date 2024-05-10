@@ -96,9 +96,6 @@ void encoderSupport(void) {
 
 void volumeUp(void) {
   if(values[V_VOLUME] < MAX_VOLUME) {
-    if(!values[V_MUTE]) {
-      mute(true);
-    }
     values[V_VOLUME]++;
     redrawVolume();
   }
@@ -106,9 +103,6 @@ void volumeUp(void) {
 
 void volumeDown(void) {
   if(values[V_VOLUME] > 0) {
-    if(!values[V_MUTE]) {
-      mute(true);
-    }
     values[V_VOLUME]--;
     redrawVolume();
   }      
@@ -148,14 +142,6 @@ void encoder(void) {
       deb("%d %d %d", lastVal, val, support);
 
       lastVal = val;
-    }
-  }
-}
-
-void muteWithEncoderSupport(void) {
-  if(isPowerON()) {
-    if (currentEncoderMillis - previousEncoderMillis >= MUTE_FOR_CHANGE_VOLUME) {
-      mute(false);
     }
   }
 }
@@ -231,12 +217,15 @@ void selectInput(int input) {
 }
 
 void storeValuesToEEPROM(void) {
+#ifdef EEPROM_SUPPORTED
   for(int a = 0; a < MAX_VALUES; a++) {
     writeAT24(a, values[a]);
   }
+#endif
 }
 
 void restoreValuesFromEEPROM(void) {
+#ifdef EEPROM_SUPPORTED
   for(int a = 0; a < MAX_VALUES; a++) {
     values[a] = readAT24(a);
   }
@@ -256,6 +245,7 @@ void restoreValuesFromEEPROM(void) {
     input = 0;
   }
   selectInput(input);
+#endif
 }
 
 bool setupErrorDetection(void) {

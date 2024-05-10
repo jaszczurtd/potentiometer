@@ -168,10 +168,6 @@ void looper(void) {
       }
     }
 
-    if(!values[V_MUTE]) {
-      muteWithEncoderSupport();
-    }
-
     int input = readInputsKeyboardState();
     if(input != -1) {
       inputSequence(input);
@@ -264,9 +260,14 @@ void inputSequence(int input) {
     }
     if(values[V_SELECTED_INPUT] != input) {
       values[V_SELECTED_INPUT] = input;
+      if(!values[V_MUTE]) {
+        mute(true);
+      }
       selectInput(input);
       storeValuesToEEPROM();
       redrawInput();
+      delay(TIME_MUTE_BBM);
+      mute(values[V_MUTE]);
     }
   }
 }

@@ -163,6 +163,7 @@ unsigned char pcf8574_read(int pcf_addr) {
 }
 
 void writeAT24(unsigned int dataAddress, byte dataVal) {
+#ifdef EEPROM_SUPPORTED
   Wire.beginTransmission(EEPROM_I2C_ADDRESS);
   Wire.write(dataAddress >> 8);
   Wire.write(dataAddress & 0xff);
@@ -173,11 +174,13 @@ void writeAT24(unsigned int dataAddress, byte dataVal) {
     watchdog_update();
   }
   delay(5);
+#endif
 }
 
 // Function to read from EEPROM
 byte readAT24(unsigned int dataAddress) {
   byte readData = 0;
+#ifdef EEPROM_SUPPORTED
   Wire.beginTransmission(EEPROM_I2C_ADDRESS);
   Wire.write(dataAddress >> 8);
   Wire.write(dataAddress & 0xff);
@@ -186,6 +189,7 @@ byte readAT24(unsigned int dataAddress) {
   if (Wire.available()) {
     readData = Wire.read();
   }
+#endif
   return readData;
 }
 

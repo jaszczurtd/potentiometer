@@ -1,6 +1,8 @@
 #ifndef T_HARDWARECONFIG
 #define T_HARDWARECONFIG
 
+#include "config.h"
+
 #define I2C_SPEED_HZ 150000
 
 #define PIN_SDA 0
@@ -24,7 +26,9 @@
 //whichone PCF8574 chip (index) is used as input selector?
 #define PCF_INPUTS 5
 
+#ifdef EEPROM_SUPPORTED
 #define EEPROM_I2C_ADDRESS 0x50
+#endif
 
 //raspberry pi pico PIO assignemnts
 

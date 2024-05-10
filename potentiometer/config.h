@@ -7,6 +7,7 @@
 //#define SKIP_INTRO
 //#define SKIP_OFF
 //#define SKIP_OFF_SECONDS_TO_START 2
+//#define EEPROM_SUPPORTED 
 
 #define SECOND 1000
 
@@ -24,6 +25,7 @@
 #define MUTE_TIME_DISPLAY 2
 #define SCREEN_DIMMER 8
 #define TIME_ENCODER_PRESS_TO_OFF 3
+#define TIME_MUTE_BBM 2
 
 #define LOADING_STEPS 35
 
