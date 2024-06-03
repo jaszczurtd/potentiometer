@@ -15,17 +15,17 @@ extern unsigned char values[];
 #define UNSYNCHRONIZE_TIME 15
 #define CORE_OPERATION_DELAY 1
 
-#define MAX_VOLUME 42
+#define MAX_VOLUME 41
 #define INPUT_SELECTOR_START_BIT 2 
 
 #define P_UNDETERMINED -1
 #define MUTE_FOR_CHANGE_VOLUME 200 //ms
 #define ENC_DEBOUNCE 4 //us
 
-#define V_VOLUME 0
-#define V_MUTE 1
-#define V_SELECTED_INPUT 2
-#define MAX_VALUES 3
+#define V_MUTE 0
+#define V_SELECTED_INPUT 1
+#define V_VOLUME 2
+#define MAX_VALUES 2
 
 int getAmountOfHardwareInputs(void);
 void initMainPIO(void);
@@ -50,6 +50,8 @@ void storeValuesToEEPROM(void);
 void restoreValuesFromEEPROM(void);
 bool setupErrorDetection(void);
 void errorLoopHandle(void);
-
+unsigned char getVolumeValue(void);
+void setVolumeValue(unsigned char val);
+void clearVol(void);
 #endif
 

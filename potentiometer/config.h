@@ -25,7 +25,7 @@
 #define MUTE_TIME_DISPLAY 2
 #define SCREEN_DIMMER 8
 #define TIME_ENCODER_PRESS_TO_OFF 3
-#define TIME_MUTE_BBM 2
+#define TIME_MUTE_BBM 10
 #define TIME_VOLUME_MBB 30
 #define TIME_DELAY_BYE 2
 
@@ -42,5 +42,9 @@
 
 //ms
 #define BRIGHTNESS_FADER_STEP_TIME 15
+
+//on / off
+#define LED_BLINK false
+
 #endif
 

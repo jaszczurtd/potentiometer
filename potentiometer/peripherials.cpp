@@ -9,6 +9,8 @@ static unsigned char inputsTab[] = {
   PIN_INPUT_6, PIN_INPUT_5, PIN_INPUT_4, PIN_INPUT_3, PIN_INPUT_1, PIN_INPUT_2
 };
 
+unsigned char values[MAX_VALUES + sizeof(inputsTab)];
+
 int getAmountOfHardwareInputs(void) {
   return sizeof(inputsTab);
 } 
@@ -73,6 +75,14 @@ void softPower(bool state) {
   digitalWrite(PIN_SOFTPOWER, state);
 }
 
+unsigned char getVolumeValue(void) {
+  return values[V_VOLUME + values[V_SELECTED_INPUT]];
+}
+
+void setVolumeValue(unsigned char val) {
+  values[V_VOLUME + values[V_SELECTED_INPUT]] = val;
+}
+
 static volatile int lastVal = P_UNDETERMINED;
 static volatile int support = P_UNDETERMINED;
 static volatile unsigned long previousEncoderMillis = 0; 
@@ -87,23 +97,25 @@ void encInit(void) {
 }
 
 void volumeUp(void) {
-  if(values[V_VOLUME] < MAX_VOLUME) {
-    values[V_VOLUME]++;
-    if(isMuteON()) {
-      muteSequence(false);
-    }
-    redrawVolume();
+  if(getVolumeValue() < MAX_VOLUME) {
+    setVolumeValue(getVolumeValue() + 1);
+  } else {
+    setVolumeValue(MAX_VOLUME);
   }
+  if(isMuteON()) {
+    muteSequence(false);
+  }
+  redrawVolume();
 }
 
 void volumeDown(void) {
-  if(values[V_VOLUME] > 0) {
-    values[V_VOLUME]--;
+  if(getVolumeValue() > 0) {
+    setVolumeValue(getVolumeValue() - 1);
     if(isMuteON()) {
       muteSequence(false);
     }
     redrawVolume();
-  }      
+  }    
 }
 
 void encoderSupport(void) {
@@ -128,7 +140,7 @@ void encoder(void) {
         (lastVal == 3 && val == 0 && support == 0) ||
         (lastVal == 0 && val == 2 && support == 2)) {
 
-        volumeUp();
+        volumeDown();
       } else
 
       if((lastVal == P_UNDETERMINED && val == 3 && support == P_UNDETERMINED) ||
@@ -139,10 +151,21 @@ void encoder(void) {
         (lastVal == 0 && val == 3 && support == 1) || 
         (lastVal == 3 && val == 0 && support == 2)) {
         
-        volumeDown();
+        volumeUp();
       }
 
       lastVal = val;
+    }
+  }
+}
+
+void clearVol(void) {
+  for (int i = 0; i < PCF8574_AMOUNT; i++) {
+    for (int j = 0; j < 8; j++) {
+      if(i == PCF_INPUTS && j > INPUT_SELECTOR_START_BIT - 1) {
+        break;
+      }
+      pcf8574_write(i, j, true);
     }
   }
 }
@@ -153,7 +176,7 @@ void setVol(int value) {
     return;
   }
 
-  if (value >= 0 && value < MAX_VOLUME) {
+  if (value >= 0 && value <= MAX_VOLUME) {
   
     int bit = value % 8;
     int expanderIndex = value / 8;

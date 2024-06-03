@@ -224,13 +224,13 @@ bool displayValues(void *v) {
     x = VOL_DIGIT_X;
     y = VOL_DIGIT_Y;
 
-    int l = values[V_VOLUME] / 10;
+    int l = getVolumeValue() / 10;
     if(lastL != l) {
       lastL = l;
       tft->drawImage(x, y, VOL_DIGIT_WIDTH, VOL_DIGIT_HEIGHT, ICONS_BG_COLOR,
                     (unsigned short*)vol_numbers[l]);
     }
-    int r = values[V_VOLUME] % 10;
+    int r = getVolumeValue() % 10;
     x += VOL_DIGIT_WIDTH + VOL_DIGIT_OFFSET;
 
     if(lastR != r) {
@@ -243,7 +243,7 @@ bool displayValues(void *v) {
   }
 
   if(redrawVolBar) {
-    drawVolumeBar(VOLUME_BAR_X, VOLUME_BAR_Y, values[V_VOLUME]);
+    drawVolumeBar(VOLUME_BAR_X, VOLUME_BAR_Y, getVolumeValue());
     redrawVolBar = false;
   }
 

@@ -12,7 +12,6 @@ bool lastStepLoading(void *v);
 bool enableOn(void *v);
 bool goOff(void *v);
 
-unsigned char values[MAX_VALUES];
 static int lastStoredVolume = P_UNDETERMINED;
 static unsigned long volumeRC5Millis = 0;
 static RC5 *rc5 = NULL;
@@ -82,7 +81,11 @@ bool alertSwitch(void) {
 
 bool callAtEverySecond(void *argument) {
   alertBlink = (alertBlink) ? false : true;
-  digitalWrite(LED_BUILTIN, alertBlink);
+  if(LED_BLINK) {
+    digitalWrite(LED_BUILTIN, alertBlink);
+  } else {
+    digitalWrite(LED_BUILTIN, false);
+  }
   return true; 
 }
 
@@ -200,8 +203,8 @@ void looper(void) {
       }
     }
 
-    if(lastStoredVolume != values[V_VOLUME]) {
-      lastStoredVolume = values[V_VOLUME];
+    if(lastStoredVolume != getVolumeValue()) {
+      lastStoredVolume = getVolumeValue();
       setVol(lastStoredVolume);
     }
   }
@@ -283,6 +286,9 @@ void inputSequence(int input) {
       selectInput(input);
       storeValuesToEEPROM();
       redrawInput();
+      redrawVolume();
+      clearVol();
+      setVol(getVolumeValue()); 
       delay(TIME_MUTE_BBM);
       mute(values[V_MUTE]);
     }
@@ -312,10 +318,10 @@ bool enableOn(void *v) {
 
 static int lastVolume = 0;
 void storeControlLocalVolume(void) {
-  lastVolume = values[V_VOLUME];
+  lastVolume = getVolumeValue();
 }
 bool volumeSave(void *v) {
-  if(lastVolume != values[V_VOLUME]) {
+  if(lastVolume != getVolumeValue()) {
     storeControlLocalVolume();
     storeValuesToEEPROM();
   }
@@ -361,8 +367,8 @@ bool loadingProgress(void *v) {
 
 bool lastStepLoading(void *v) {
   restoreValuesFromEEPROM();
-  lastStoredVolume = values[V_VOLUME];
-  setVol(values[V_VOLUME]); 
+  lastStoredVolume = getVolumeValue();
+  setVol(getVolumeValue()); 
   selectInput(values[V_SELECTED_INPUT]);
 
   isLoaded = true;

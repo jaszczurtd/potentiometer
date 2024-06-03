@@ -1344,7 +1344,7 @@ const unsigned short vol_9[] PROGMEM = {
 
 //sum has to match MAX_VOLUME !!
 #define SECTION_0 23
-#define SECTION_1 14
+#define SECTION_1 13
 #define SECTION_2 5
 #define SECTION_M (SECTION_0 + SECTION_1)
 
